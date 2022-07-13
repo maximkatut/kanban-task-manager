@@ -24,6 +24,8 @@ module.exports = {
         DEFAULT: "#EA5555",
         hover: "#FF9898",
       },
+      blue: "#49C4E5",
+      green: "#67E2AE",
     },
     extend: {},
   },
