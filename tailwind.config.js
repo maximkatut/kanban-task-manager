@@ -8,6 +8,7 @@ module.exports = {
       grey: {
         light: "#F4F7FD",
         create: "#E9EFFA",
+        ["create-dark"]: "rgba(43,44,55,0.25)",
         medium: "#828FA3",
         dark: "#2B2C37",
         ["very-dark"]: "#20212C",

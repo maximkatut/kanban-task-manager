@@ -9,7 +9,7 @@ interface SidebarProps {
 const Sidebar = ({ setIsMenuOpen, isMenuOpen }: SidebarProps) => {
   return (
     <aside
-      className={`transition-all pb-8 w-[calc(75rem/4)] h-[calc(100vh-98px)] bg-white fixed top-[98px] ${
+      className={`transition-all pb-8 w-[calc(75rem/4)] h-[calc(100vh-98px)] bg-white dark:bg-grey-dark fixed top-[98px] ${
         isMenuOpen ? "left-0" : "-left-80"
       } flex flex-col justify-between`}
     >
