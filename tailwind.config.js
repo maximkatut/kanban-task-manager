@@ -7,6 +7,7 @@ module.exports = {
       black: "#000112",
       grey: {
         light: "#F4F7FD",
+        create: "#E9EFFA",
         medium: "#828FA3",
         dark: "#2B2C37",
         ["very-dark"]: "#20212C",
@@ -19,6 +20,7 @@ module.exports = {
       purple: {
         DEFAULT: "#635FC7",
         hover: "#A8A4FF",
+        10: "rgba(99,95,199,0.1)",
       },
       red: {
         DEFAULT: "#EA5555",
