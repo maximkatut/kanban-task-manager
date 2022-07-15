@@ -59,3 +59,37 @@ model VerificationToken {
 
     @@unique([identifier, token])
 }
+
+model Board {
+    id      String   @id @default(cuid())
+    name    String
+    columns Column[]
+}
+
+model Column {
+    id      String @id @default(cuid())
+    name    String
+    tasks   Task[]
+    Board   Board  @relation(fields: [boardId], references: [id])
+    boardId String
+
+    @@unique([id, name])
+}
+
+model Task {
+    id          String    @id @default(cuid())
+    title       String
+    description String
+    status      String
+    subtasks    Subtask[]
+    Column      Column    @relation(fields: [columnId, status], references: [id, name])
+    columnId    String
+}
+
+model Subtask {
+    id          String  @id @default(cuid())
+    title       String
+    isCompleted Boolean
+    Task        Task?   @relation(fields: [taskId], references: [id])
+    taskId      String?
+}
