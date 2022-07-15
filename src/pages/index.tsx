@@ -7,9 +7,12 @@ import DotsButton from "../components/dotsButton";
 import Layout from "../components/layout";
 import Sidebar from "../components/sidebar";
 import Logo from "../components/svg/logo";
+import { trpc } from "../utils/trpc";
 
 const Home: NextPage = () => {
   const [isMenuOpen, setIsMenuOpen] = useState<boolean>(true);
+  const { data: boards } = trpc.useQuery(["board.getAll"]);
+  console.log(boards);
   return (
     <Layout>
       <Head>
@@ -41,7 +44,7 @@ const Home: NextPage = () => {
         </div>
       </header>
       <div className="inline-flex mt-[98px]">
-        <Sidebar {...{ setIsMenuOpen, isMenuOpen }} />
+        {boards && <Sidebar {...{ setIsMenuOpen, isMenuOpen, boards }} />}
         <main
           className={`${
             isMenuOpen ? "ml-[calc(75rem/4)]" : ""
