@@ -1,7 +1,8 @@
+import { Board } from "@prisma/client";
 import type { NextPage } from "next";
 import Head from "next/head";
 import { useState } from "react";
-import Board from "../components/board";
+import BoardComponent from "../components/boardComponent";
 import Button from "../components/button";
 import DotsButton from "../components/dotsButton";
 import Layout from "../components/layout";
@@ -11,8 +12,9 @@ import { trpc } from "../utils/trpc";
 
 const Home: NextPage = () => {
   const [isMenuOpen, setIsMenuOpen] = useState<boolean>(true);
+  const [activeBoard, setActiveBoard] = useState<undefined | Board>();
   const { data: boards } = trpc.useQuery(["board.getAll"]);
-  console.log(boards);
+
   return (
     <Layout>
       <Head>
@@ -32,7 +34,7 @@ const Home: NextPage = () => {
           <Logo />
         </div>
         <div className="flex items-center justify-between flex-grow pl-10 pr-6">
-          <h1 className="text-2xl font-bold">Platform Launch</h1>
+          <h2 className="text-2xl font-bold">Platform Launch</h2>
           <div className="flex justify-between text-base">
             <Button>+ Add New Task</Button>
             <DotsButton
@@ -44,13 +46,14 @@ const Home: NextPage = () => {
         </div>
       </header>
       <div className="inline-flex mt-[98px]">
-        {boards && <Sidebar {...{ setIsMenuOpen, isMenuOpen, boards }} />}
+        {boards && <Sidebar {...{ setIsMenuOpen, isMenuOpen, boards, setActiveBoard, activeBoard }} />}
         <main
           className={`${
             isMenuOpen ? "ml-[calc(75rem/4)]" : ""
           } transition-all bg-grey-light dark:bg-grey-very-dark min-h-[calc(100vh-98px)] min-w-[calc(100vw-75rem/4)]`}
         >
-          <Board />
+          <h1 className="visually-hidden">Kanban - Task Manager</h1>
+          <BoardComponent board={activeBoard} />
         </main>
       </div>
     </Layout>

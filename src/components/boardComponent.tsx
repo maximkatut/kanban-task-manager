@@ -1,9 +1,10 @@
+import { Board } from "@prisma/client";
 import Column from "./column";
 interface BoardProps {
-  children?: React.ReactNode;
+  board: Board | undefined;
 }
 
-const Board = ({ children }: BoardProps) => {
+const Board = ({ board }: BoardProps) => {
   return (
     <ul className="min-h-[calc(100vh-80rem)] p-5 flex">
       <Column />
