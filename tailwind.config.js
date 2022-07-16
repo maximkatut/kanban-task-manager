@@ -22,6 +22,7 @@ module.exports = {
         DEFAULT: "#635FC7",
         hover: "#A8A4FF",
         10: "rgba(99,95,199,0.1)",
+        25: "rgba(99,95,199,0.25)",
       },
       red: {
         DEFAULT: "#EA5555",

@@ -25,7 +25,7 @@ const Home: NextPage = () => {
         <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png" />
         <link rel="manifest" href="/site.webmanifest" />
       </Head>
-      <header className="flex items-center bg-white dark:bg-grey-dark fixed w-full top-0 left-0 z-10">
+      <header className="flex items-center bg-white dark:bg-grey-dark fixed w-full top-0 left-0">
         <div
           className={`transition-all py-9 ${
             isMenuOpen ? "pl-7 pr-[119px]" : "px-7"
