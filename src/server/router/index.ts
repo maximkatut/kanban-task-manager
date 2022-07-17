@@ -1,4 +1,5 @@
 import { columnRouter } from "./column";
+import { subtaskRouter } from "./subtask";
 import { taskRouter } from "./task";
 // src/server/router/index.ts
 import superjson from "superjson";
@@ -12,7 +13,8 @@ export const appRouter = createRouter()
   .merge("board.", boardRouter)
   .merge("auth.", authRouter)
   .merge("column.", columnRouter)
-  .merge("task.", taskRouter);
+  .merge("task.", taskRouter)
+  .merge("subtask.", subtaskRouter);
 
 // export type definition of API
 export type AppRouter = typeof appRouter;

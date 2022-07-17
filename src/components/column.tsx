@@ -1,4 +1,5 @@
 import { Column } from "@prisma/client";
+import { trpc } from "../utils/trpc";
 import Task from "./task";
 
 interface ColumnProps {
@@ -6,6 +7,7 @@ interface ColumnProps {
 }
 
 const Column = ({ column }: ColumnProps) => {
+  const { data: tasks } = trpc.useQuery(["task.getByColumnId", { columnId: column.id }]);
   return (
     <li className="w-[305px]">
       <h3 className="uppercase flex items-center mb-5">
@@ -15,11 +17,9 @@ const Column = ({ column }: ColumnProps) => {
         </span>
       </h3>
       <ul>
-        <Task />
-        <Task />
-        <Task />
-        <Task />
-        <Task />
+        {tasks?.map((t) => {
+          return <Task key={t.id} task={t} />;
+        })}
       </ul>
     </li>
   );
