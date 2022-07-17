@@ -1,7 +1,6 @@
 import { Board } from "@prisma/client";
 import { Dispatch, SetStateAction, useState } from "react";
 import ReactModal from "react-modal";
-import { trpc } from "../utils/trpc";
 import AsideButton from "./asideButtton";
 import BoardForm from "./boardForm";
 import Toggle from "./toggle";
@@ -15,18 +14,10 @@ interface SidebarProps {
 }
 
 const Sidebar = ({ setIsMenuOpen, isMenuOpen, boards, setActiveBoard, activeBoard }: SidebarProps) => {
-  const [isModalOpen, setisModalOpen] = useState<boolean>(false);
-  const client = trpc.useContext();
-  const { mutate: createBoard } = trpc.useMutation("board.create", {
-    async onSuccess(data) {
-      await client.invalidateQueries(["board.getAll"]);
-      setActiveBoard(data);
-    },
-  });
+  const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
 
   const createButtonHandler = () => {
-    setisModalOpen(true);
-    // createBoard({ name: "new board" });
+    setIsModalOpen(true);
   };
 
   return (
@@ -41,16 +32,17 @@ const Sidebar = ({ setIsMenuOpen, isMenuOpen, boards, setActiveBoard, activeBoar
             margin: "0 auto",
             width: "480px",
             height: "min-content",
-            padding: "30px",
+            padding: "0",
+            border: "none",
           },
           overlay: { zIndex: "10", backgroundColor: "rgba(0,0,0,0.5)" },
         }}
         isOpen={isModalOpen}
         onRequestClose={() => {
-          setisModalOpen((prev) => !prev);
+          setIsModalOpen((prev) => !prev);
         }}
       >
-        <BoardForm />
+        <BoardForm setIsModalOpen={setIsModalOpen} setActiveBoard={setActiveBoard} />
       </ReactModal>
       <aside
         className={`transition-all pb-8 w-[calc(75rem/4)] h-[calc(100vh-98px)] bg-white dark:bg-grey-dark fixed bottom-0 ${

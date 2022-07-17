@@ -53,7 +53,7 @@ const Home: NextPage = () => {
           } transition-all bg-grey-light dark:bg-grey-very-dark min-h-[calc(100vh-98px)] min-w-[calc(100vw-75rem/4)]`}
         >
           <h1 className="visually-hidden">Kanban - Task Manager</h1>
-          <BoardComponent board={activeBoard} />
+          {activeBoard && <BoardComponent board={activeBoard} />}
         </main>
       </div>
     </Layout>
