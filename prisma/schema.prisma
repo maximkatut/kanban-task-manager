@@ -79,7 +79,7 @@ model Column {
 model Task {
     id          String    @id @default(cuid())
     title       String
-    description String
+    description String?
     status      String
     subtasks    Subtask[]
     Column      Column    @relation(fields: [columnId, status], references: [id, name])
@@ -90,6 +90,6 @@ model Subtask {
     id          String  @id @default(cuid())
     title       String
     isCompleted Boolean
-    Task        Task?   @relation(fields: [taskId], references: [id])
-    taskId      String?
+    Task        Task    @relation(fields: [taskId], references: [id])
+    taskId      String
 }
