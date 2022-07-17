@@ -18,4 +18,32 @@ export const boardRouter = createRouter()
         },
       });
     },
+  })
+  .mutation("edit", {
+    input: z.object({
+      boardId: z.string(),
+      boardName: z.string(),
+    }),
+    async resolve({ input, ctx }) {
+      return await ctx.prisma.board.update({
+        where: {
+          id: input.boardId,
+        },
+        data: {
+          name: input.boardName,
+        },
+      });
+    },
+  })
+  .mutation("delete", {
+    input: z.object({
+      boardId: z.string(),
+    }),
+    async resolve({ input, ctx }) {
+      return await ctx.prisma.board.delete({
+        where: {
+          id: input.boardId,
+        },
+      });
+    },
   });
