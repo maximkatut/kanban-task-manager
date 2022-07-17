@@ -3,11 +3,9 @@ import type { NextPage } from "next";
 import Head from "next/head";
 import { useState } from "react";
 import BoardComponent from "../components/boardComponent";
-import Button from "../components/button";
-import DotsButton from "../components/dotsButton";
+import Header from "../components/header";
 import Layout from "../components/layout";
 import Sidebar from "../components/sidebar";
-import Logo from "../components/svg/logo";
 import { trpc } from "../utils/trpc";
 
 const Home: NextPage = () => {
@@ -25,26 +23,7 @@ const Home: NextPage = () => {
         <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png" />
         <link rel="manifest" href="/site.webmanifest" />
       </Head>
-      <header className="flex items-center bg-white dark:bg-grey-dark fixed w-full top-0 left-0">
-        <div
-          className={`transition-all py-9 ${
-            isMenuOpen ? "pl-7 pr-[119px]" : "px-7"
-          } border-r-[1px] border-lines-light dark:border-x-lines-dark`}
-        >
-          <Logo />
-        </div>
-        <div className="flex items-center justify-between flex-grow pl-10 pr-6">
-          <h2 className="text-2xl font-bold">Platform Launch</h2>
-          <div className="flex justify-between text-base">
-            <Button>+ Add New Task</Button>
-            <DotsButton
-              onClick={() => {
-                console.log("dots");
-              }}
-            />
-          </div>
-        </div>
-      </header>
+      <Header isMenuOpen={isMenuOpen} />
       <div className="inline-flex mt-[98px]">
         {boards && <Sidebar {...{ setIsMenuOpen, isMenuOpen, boards, setActiveBoard, activeBoard }} />}
         <main
