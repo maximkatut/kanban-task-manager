@@ -1,6 +1,6 @@
 import { Column } from "@prisma/client";
 import { trpc } from "../utils/trpc";
-import Task from "./task";
+import TaskComponent from "./task";
 
 interface ColumnProps {
   column: Column;
@@ -13,12 +13,12 @@ const Column = ({ column }: ColumnProps) => {
       <h3 className="uppercase flex items-center mb-5">
         <span className="w-4 h-4 bg-blue rounded-full inline-block mb-1"></span>
         <span className="ml-4 tracking-[0.15rem]">
-          {column.name} ({0})
+          {column.name} ({tasks?.length})
         </span>
       </h3>
       <ul>
         {tasks?.map((t) => {
-          return <Task key={t.id} task={t} />;
+          return <TaskComponent key={t.id} task={t} />;
         })}
       </ul>
     </li>
