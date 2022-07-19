@@ -1,4 +1,3 @@
-import { Board } from "@prisma/client";
 import type { NextPage } from "next";
 import Head from "next/head";
 import { useState } from "react";
@@ -6,12 +5,13 @@ import BoardComponent from "../components/boardComponent";
 import Header from "../components/header";
 import Layout from "../components/layout";
 import Sidebar from "../components/sidebar";
+import { useStore } from "../store";
 import { trpc } from "../utils/trpc";
 
 const Home: NextPage = () => {
   const [isMenuOpen, setIsMenuOpen] = useState<boolean>(true);
-  const [activeBoard, setActiveBoard] = useState<undefined | Board>();
   const { data: boards } = trpc.useQuery(["board.getAll"]);
+  const activeBoard = useStore((state) => state.activeBoard);
 
   return (
     <Layout>
@@ -25,7 +25,7 @@ const Home: NextPage = () => {
       </Head>
       <Header isMenuOpen={isMenuOpen} />
       <div className="inline-flex mt-[98px]">
-        {boards && <Sidebar {...{ setIsMenuOpen, isMenuOpen, boards, setActiveBoard, activeBoard }} />}
+        {boards && <Sidebar {...{ setIsMenuOpen, isMenuOpen, boards }} />}
         <main
           className={`${
             isMenuOpen ? "ml-[calc(75rem/4)]" : ""

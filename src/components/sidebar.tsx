@@ -1,20 +1,21 @@
 import { Board } from "@prisma/client";
-import { Dispatch, SetStateAction, useState } from "react";
-import ReactModal from "react-modal";
+import { useState } from "react";
+import { useStore } from "../store";
 import AsideButton from "./asideButtton";
 import BoardForm from "./boardForm";
+import Modal from "./modal";
 import Toggle from "./toggle";
 
 interface SidebarProps {
   setIsMenuOpen: (x: boolean) => void;
   isMenuOpen: boolean;
   boards: Board[];
-  setActiveBoard: Dispatch<SetStateAction<Board | undefined>>;
-  activeBoard?: Board;
 }
 
-const Sidebar = ({ setIsMenuOpen, isMenuOpen, boards, setActiveBoard, activeBoard }: SidebarProps) => {
+const Sidebar = ({ setIsMenuOpen, isMenuOpen, boards }: SidebarProps) => {
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
+  const setActiveBoard = useStore((state) => state.setActiveBoard);
+  const activeBoard = useStore((state) => state.activeBoard);
 
   const createButtonHandler = () => {
     setIsModalOpen(true);
@@ -22,28 +23,9 @@ const Sidebar = ({ setIsMenuOpen, isMenuOpen, boards, setActiveBoard, activeBoar
 
   return (
     <>
-      <ReactModal
-        style={{
-          content: {
-            top: "140px",
-            left: "0",
-            right: "0",
-            bottom: "140px",
-            margin: "0 auto",
-            width: "480px",
-            height: "min-content",
-            padding: "0",
-            border: "none",
-          },
-          overlay: { zIndex: "10", backgroundColor: "rgba(0,0,0,0.5)" },
-        }}
-        isOpen={isModalOpen}
-        onRequestClose={() => {
-          setIsModalOpen((prev) => !prev);
-        }}
-      >
-        <BoardForm setIsModalOpen={setIsModalOpen} setActiveBoard={setActiveBoard} />
-      </ReactModal>
+      <Modal {...{ isModalOpen, setIsModalOpen }}>
+        <BoardForm setIsModalOpen={setIsModalOpen} editMode={false} />
+      </Modal>
       <aside
         className={`transition-all pb-8 w-[calc(75rem/4)] h-[calc(100vh-98px)] bg-white dark:bg-grey-dark fixed bottom-0 ${
           isMenuOpen ? "left-0 overflow-scroll" : "-left-80"
