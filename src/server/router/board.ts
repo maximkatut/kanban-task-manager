@@ -19,7 +19,7 @@ export const boardRouter = createRouter()
       });
     },
   })
-  .mutation("edit", {
+  .mutation("update", {
     input: z.object({
       boardId: z.string(),
       boardName: z.string(),

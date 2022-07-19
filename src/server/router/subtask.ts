@@ -19,6 +19,7 @@ export const subtaskRouter = createRouter()
       name: z.string(),
       taskId: z.string(),
       isCompleted: z.boolean(),
+      order: z.number(),
     }),
     async resolve({ input, ctx }) {
       return await ctx.prisma.subtask.create({
@@ -26,6 +27,7 @@ export const subtaskRouter = createRouter()
           title: input.name,
           taskId: input.taskId,
           isCompleted: input.isCompleted,
+          order: input.order,
         },
       });
     },

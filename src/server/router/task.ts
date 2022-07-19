@@ -19,6 +19,7 @@ export const taskRouter = createRouter()
       name: z.string(),
       columnId: z.string(),
       columnName: z.string(),
+      order: z.number(),
     }),
     async resolve({ input, ctx }) {
       return await ctx.prisma.task.create({
@@ -26,6 +27,7 @@ export const taskRouter = createRouter()
           title: input.name,
           columnId: input.columnId,
           status: input.columnName,
+          order: input.order,
         },
       });
     },

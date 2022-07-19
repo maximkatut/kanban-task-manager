@@ -7,7 +7,7 @@ generator client {
 
 datasource db {
     provider = "sqlite"
-    url      = "file:./db.sqlite"
+    url      = "file:./db.sqlite?connect_timeout=3000"
     // url      = env("DATABASE_URL")
 }
 
@@ -61,16 +61,18 @@ model VerificationToken {
 }
 
 model Board {
-    id      String   @id @default(cuid())
-    name    String
-    columns Column[]
+    id        String   @id @default(cuid())
+    name      String
+    createdAt DateTime @default(now())
+    columns   Column[]
 }
 
 model Column {
     id      String @id @default(cuid())
     name    String
+    order   Int
     tasks   Task[]
-    Board   Board  @relation(fields: [boardId], references: [id])
+    Board   Board  @relation(fields: [boardId], references: [id], onDelete: Cascade, onUpdate: Cascade)
     boardId String
 
     @@unique([id, name])
@@ -81,8 +83,9 @@ model Task {
     title       String
     description String?
     status      String
+    order       Int
     subtasks    Subtask[]
-    Column      Column    @relation(fields: [columnId, status], references: [id, name])
+    Column      Column    @relation(fields: [columnId, status], references: [id, name], onDelete: Cascade, onUpdate: Cascade)
     columnId    String
 }
 
@@ -90,6 +93,7 @@ model Subtask {
     id          String  @id @default(cuid())
     title       String
     isCompleted Boolean
-    Task        Task    @relation(fields: [taskId], references: [id])
+    order       Int
+    Task        Task    @relation(fields: [taskId], references: [id], onDelete: Cascade, onUpdate: Cascade)
     taskId      String
 }

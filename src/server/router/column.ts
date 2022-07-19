@@ -18,12 +18,44 @@ export const columnRouter = createRouter()
     input: z.object({
       name: z.string(),
       boardId: z.string(),
+      order: z.number(),
     }),
     async resolve({ input, ctx }) {
       return await ctx.prisma.column.create({
         data: {
           name: input.name,
           boardId: input.boardId,
+          order: input.order,
+        },
+      });
+    },
+  })
+  .mutation("update", {
+    input: z.object({
+      columnId: z.string(),
+      columnName: z.string(),
+      order: z.number(),
+    }),
+    async resolve({ input, ctx }) {
+      return await ctx.prisma.column.update({
+        where: {
+          id: input.columnId,
+        },
+        data: {
+          name: input.columnName,
+          order: input.order,
+        },
+      });
+    },
+  })
+  .mutation("delete", {
+    input: z.object({
+      columnId: z.string(),
+    }),
+    async resolve({ input, ctx }) {
+      return await ctx.prisma.column.delete({
+        where: {
+          id: input.columnId,
         },
       });
     },
