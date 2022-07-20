@@ -15,10 +15,11 @@ const Modal = ({ children, isModalOpen, setIsModalOpen }: ModalProps) => {
     <ReactModal
       style={{
         content: {
-          top: "140px",
+          top: "0",
+          bottom: "0",
           left: "0",
           right: "0",
-          margin: "0 auto",
+          margin: "auto",
           width: "480px",
           maxHeight: "500px",
           height: "min-content",
