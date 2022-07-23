@@ -1,6 +1,6 @@
 import type { NextPage } from "next";
 import Head from "next/head";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import BoardComponent from "../components/boardComponent";
 import Header from "../components/header";
 import Layout from "../components/layout";
@@ -12,11 +12,18 @@ const Home: NextPage = () => {
   const [isMenuOpen, setIsMenuOpen] = useState<boolean>(true);
   const { data: boards } = trpc.useQuery(["board.getAll"]);
   const activeBoard = useStore((state) => state.activeBoard);
+  const setActiveBoard = useStore((state) => state.setActiveBoard);
+
+  useEffect(() => {
+    if (!activeBoard && boards) {
+      setActiveBoard(boards[0]);
+    }
+  });
 
   return (
     <Layout>
       <Head>
-        <title>Kanban - Task Manager</title>
+        <title>{`Kanban - Task Manager ${activeBoard ? "- " + activeBoard.name : ""}`}</title>
         <meta name="description" content="Kanban - task manager" />
         <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
         <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png" />
@@ -32,7 +39,11 @@ const Home: NextPage = () => {
           } transition-all bg-grey-light dark:bg-grey-very-dark min-h-[calc(100vh-98px)] min-w-[calc(100vw-75rem/4)]`}
         >
           <h1 className="visually-hidden">Kanban - Task Manager</h1>
-          {activeBoard && <BoardComponent board={activeBoard} />}
+          {activeBoard ? (
+            <BoardComponent board={activeBoard} />
+          ) : (
+            <p className="bg-purple text-white p-3 text-base">Pick a board or create a new one...</p>
+          )}
         </main>
       </div>
     </Layout>
