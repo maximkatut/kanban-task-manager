@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import { useStore } from "../store/index";
 import BoardForm from "./boardForm";
 import Button from "./button";
+import DeleteModalInsert from "./deleteModalInsert";
 import DotsButton from "./dotsButton";
 import Modal from "./modal";
 import Logo from "./svg/logo";
@@ -13,6 +14,7 @@ const Header = ({ isMenuOpen }: HeaderProps) => {
   const ref = useRef<HTMLDivElement | null>(null);
   const activeBoard = useStore((state) => state.activeBoard);
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState<boolean>(false);
   const [isDotsMenuOpen, setIsDotsMenuOpen] = useState<Boolean>(false);
   const clickDotsButtonHandler = () => {
     setIsDotsMenuOpen((prevState) => !prevState);
@@ -32,12 +34,21 @@ const Header = ({ isMenuOpen }: HeaderProps) => {
 
   const handleEditClick = () => {
     setIsModalOpen(true);
+    setIsDotsMenuOpen(false);
+  };
+
+  const handleDeletetClick = () => {
+    setIsDeleteModalOpen(true);
+    setIsDotsMenuOpen(false);
   };
 
   return (
     <>
       <Modal {...{ isModalOpen, setIsModalOpen }}>
-        <BoardForm setIsModalOpen={setIsModalOpen} editMode={true} />
+        <BoardForm setIsModalOpen={setIsModalOpen} isEditMode={true} />
+      </Modal>
+      <Modal isModalOpen={isDeleteModalOpen} setIsModalOpen={setIsDeleteModalOpen}>
+        <DeleteModalInsert {...{ setIsDeleteModalOpen }} />
       </Modal>
       <header className="flex items-center bg-white dark:bg-grey-dark fixed w-full top-0 left-0">
         <div
@@ -60,7 +71,9 @@ const Header = ({ isMenuOpen }: HeaderProps) => {
                 <button onClick={handleEditClick} className="text-grey-medium text-left mb-2">
                   Edit Board
                 </button>
-                <button className="text-red text-left">Delete Board</button>
+                <button onClick={handleDeletetClick} className="text-red text-left">
+                  Delete Board
+                </button>
               </div>
             )}
           </div>
