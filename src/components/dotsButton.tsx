@@ -1,10 +1,12 @@
+import { useStore } from "../store/index";
 interface DotsButtonProps {
   onClick?: () => void;
 }
 
 const DotsButton = ({ onClick }: DotsButtonProps) => {
+  const activeBoard = useStore((state) => state.activeBoard);
   return (
-    <button onClick={onClick} className="px-2 group">
+    <button onClick={onClick} disabled={!activeBoard} className="px-2 group">
       <svg
         className="group-hover:fill-purple fill-grey-medium"
         width="5"
