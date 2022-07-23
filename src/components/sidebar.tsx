@@ -24,7 +24,7 @@ const Sidebar = ({ setIsMenuOpen, isMenuOpen, boards }: SidebarProps) => {
   return (
     <>
       <Modal {...{ isModalOpen, setIsModalOpen }}>
-        <BoardForm setIsModalOpen={setIsModalOpen} editMode={false} />
+        <BoardForm setIsModalOpen={setIsModalOpen} />
       </Modal>
       <aside
         className={`transition-all pb-8 w-[calc(75rem/4)] h-[calc(100vh-98px)] bg-white dark:bg-grey-dark fixed bottom-0 ${

@@ -1,75 +1,52 @@
-import { Board } from "@prisma/client";
-import { useEffect, useState } from "react";
-import { SubmitHandler, useFieldArray, useForm } from "react-hook-form";
-import { trpc } from "../utils/trpc";
+import useCreateBoard from "../hooks/useCreateBoard";
+import useEditBoard from "../hooks/useEditBoard";
+import { useStore } from "../store/index";
 import Button from "./button";
 interface BoardFormProps {
   setIsModalOpen: (x: boolean) => void;
-  setActiveBoard: (x: Board) => void;
+  isEditMode?: boolean;
 }
 
-interface Inputs {
-  boardName: string;
-  column: {
-    name: string;
-  }[];
-}
+const BoardForm = ({ setIsModalOpen, isEditMode }: BoardFormProps) => {
+  const activeBoard = useStore((state) => state.activeBoard);
 
-const BoardForm = ({ setIsModalOpen, setActiveBoard }: BoardFormProps) => {
-  const [newBoard, setNewBoard] = useState<Board>();
-  const [newColumns, setNewColumns] = useState<{ name: string }[]>();
-  const client = trpc.useContext();
-  const { mutate: createTask } = trpc.useMutation("column.create");
-  const { mutate: createBoard } = trpc.useMutation("board.create", {
-    async onSuccess(data) {
-      await client.invalidateQueries(["board.getAll"]);
-      setIsModalOpen(false);
-      setActiveBoard(data);
-      setNewBoard(data);
-    },
-  });
   const {
-    register,
-    handleSubmit,
-    control,
-    formState: { errors },
-  } = useForm<Inputs>({
-    defaultValues: {
-      boardName: "",
-      column: [{ name: "Todo" }, { name: "Doing" }],
-    },
+    onCreateSubmit,
+    registerCreate,
+    errorsCreate,
+    fieldsCreate,
+    handleNewColumnButtonCreate,
+    handleRemoveCrossButtonCreate,
+  } = useCreateBoard({
+    setIsModalOpen,
   });
 
-  const { fields, append, remove } = useFieldArray({
-    control,
-    name: "column" as never,
-  });
+  const { onEditSubmit, registerEdit, errorsEdit, fieldsEdit, handleNewColumnButtonEdit, handleRemoveCrossButtonEdit } =
+    useEditBoard({
+      setIsModalOpen,
+    });
 
-  const onSubmit: SubmitHandler<Inputs> = (data) => {
-    setNewColumns(data.column);
-    createBoard({ name: data.boardName });
-  };
-
-  useEffect(() => {
-    newColumns &&
-      newBoard &&
-      newColumns.map((c) => {
-        createTask({ ...c, boardId: newBoard.id });
-      });
-  }, [createTask, newBoard, newColumns]);
+  const onSubmit = isEditMode ? onEditSubmit : onCreateSubmit;
+  const register = isEditMode ? registerEdit : registerCreate;
+  const errors = isEditMode ? errorsEdit : errorsCreate;
+  const fields = isEditMode ? fieldsEdit : fieldsCreate;
+  const handleRemoveCrossButton = isEditMode ? handleRemoveCrossButtonEdit : handleRemoveCrossButtonCreate;
+  const handleNewColumnButton = isEditMode ? handleNewColumnButtonEdit : handleNewColumnButtonCreate;
 
   return (
-    <form onSubmit={handleSubmit(onSubmit)} className="dark:bg-grey-very-dark p-8 rounded-sm">
-      <h3 className="text-lg mb-5 font-bold">Add New Board</h3>
+    <form onSubmit={onSubmit} className="dark:bg-grey-very-dark p-8 rounded-sm">
+      <h3 className="text-lg mb-5 font-bold">{isEditMode ? `Edit ${activeBoard?.name}` : "Add New Board"}</h3>
       <label htmlFor="name" className="text-grey-medium text-xs block mb-2">
-        Board Name
+        {isEditMode ? activeBoard?.name : "Board Name"}
       </label>
       <input
         {...register("boardName", { required: true })}
         placeholder="e.g. Web Design"
         type="text"
         id="name"
-        className="w-full py-2 px-4 border-[1px] border-lines-light dark:border-lines-dark rounded-sm mb-5 dark:bg-grey-very-dark"
+        className={`w-full py-2 px-4 border-[1px] ${
+          errors.boardName ? "border-red animate-shake" : "border-lines-light dark:border-lines-dark"
+        } rounded-sm mb-5 dark:bg-grey-very-dark`}
       />
       <label className="text-grey-medium text-xs block mb-2">Board Columns</label>
       {fields.map((f, i) => {
@@ -78,16 +55,23 @@ const BoardForm = ({ setIsModalOpen, setActiveBoard }: BoardFormProps) => {
             <input
               {...register(`column.${i}.name` as const, { required: true })}
               placeholder="Column name..."
-              defaultValue="Todo"
               type="text"
               id="column"
-              className="w-[93%] py-2 px-4 border-[1px]  border-lines-light dark:border-lines-dark rounded-sm mb-2 dark:bg-grey-very-dark"
+              className={`w-[85%] py-2 px-4 border-[1px] ${
+                errors?.[`column`]?.[`${i}`] ? "border-red animate-shake" : "border-lines-light dark:border-lines-dark"
+              } rounded-sm mb-2 dark:bg-grey-very-dark`}
+            />
+            <input
+              {...register(`column.${i}.color` as const, { required: true })}
+              type="color"
+              defaultValue={"#FF9898"}
+              className={`w-6 h-6 mb-2`}
             />
             <button
               aria-label="Remove column input"
               className="mb-1"
               onClick={() => {
-                remove(i);
+                handleRemoveCrossButton(i);
               }}
             >
               <svg width="15" height="15" xmlns="http://www.w3.org/2000/svg">
@@ -101,9 +85,7 @@ const BoardForm = ({ setIsModalOpen, setActiveBoard }: BoardFormProps) => {
         );
       })}
       <Button
-        onClick={() => {
-          append({ name: "" });
-        }}
+        onClick={handleNewColumnButton}
         styles="mr-4 rounded-full px-6 py-3 font-bold text-purple bg-purple-10 hover:bg-purple-25 w-full mb-5"
       >
         + Add New Column
@@ -112,7 +94,7 @@ const BoardForm = ({ setIsModalOpen, setActiveBoard }: BoardFormProps) => {
         type="submit"
         styles="mr-4 rounded-full px-6 py-3 font-bold text-white bg-purple hover:bg-purple-hover w-full"
       >
-        Create New Board
+        {isEditMode ? `Update Board` : "Create New Board"}
       </Button>
     </form>
   );
