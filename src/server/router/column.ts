@@ -19,6 +19,7 @@ export const columnRouter = createRouter()
       name: z.string(),
       boardId: z.string(),
       order: z.number(),
+      color: z.string(),
     }),
     async resolve({ input, ctx }) {
       return await ctx.prisma.column.create({
@@ -26,36 +27,39 @@ export const columnRouter = createRouter()
           name: input.name,
           boardId: input.boardId,
           order: input.order,
+          color: input.color,
         },
       });
     },
   })
   .mutation("update", {
     input: z.object({
-      columnId: z.string(),
-      columnName: z.string(),
+      id: z.string(),
+      name: z.string(),
       order: z.number(),
+      color: z.string(),
     }),
     async resolve({ input, ctx }) {
       return await ctx.prisma.column.update({
         where: {
-          id: input.columnId,
+          id: input.id,
         },
         data: {
-          name: input.columnName,
+          name: input.name,
           order: input.order,
+          color: input.color,
         },
       });
     },
   })
   .mutation("delete", {
     input: z.object({
-      columnId: z.string(),
+      id: z.string(),
     }),
     async resolve({ input, ctx }) {
       return await ctx.prisma.column.delete({
         where: {
-          id: input.columnId,
+          id: input.id,
         },
       });
     },
