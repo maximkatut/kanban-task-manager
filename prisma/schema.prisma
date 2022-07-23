@@ -74,6 +74,7 @@ model Column {
     tasks   Task[]
     Board   Board  @relation(fields: [boardId], references: [id], onDelete: Cascade, onUpdate: Cascade)
     boardId String
+    color   String
 
     @@unique([id, name])
 }

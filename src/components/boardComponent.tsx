@@ -3,7 +3,7 @@ import { useState } from "react";
 import { SubmitHandler, useForm } from "react-hook-form";
 import { trpc } from "../utils/trpc";
 import Button from "./button";
-import Column from "./column";
+import Column from "./columnComponent";
 import Modal from "./modal";
 interface BoardProps {
   board: Board;
@@ -11,22 +11,24 @@ interface BoardProps {
 
 interface Inputs {
   columnName: string;
+  color: string;
 }
 
 const Board = ({ board }: BoardProps) => {
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
   const utils = trpc.useContext();
-  const { data: columns } = trpc.useQuery(["column.getByBoardId", { boardId: board.id }], {
+  const { data: columns } = trpc.useQuery(["column.getByBoardId", { boardId: board.id }]);
+  const { mutateAsync: createColumn, isLoading } = trpc.useMutation("column.create", {
     async onSuccess() {
       await utils.invalidateQueries(["column.getByBoardId", { boardId: board.id }]);
     },
   });
-  const { mutateAsync: createColumn, isLoading } = trpc.useMutation("column.create");
   const {
     register,
     formState: { errors },
     handleSubmit,
-  } = useForm<Inputs>({ defaultValues: { columnName: "" } });
+    reset,
+  } = useForm<Inputs>({ defaultValues: { columnName: "", color: "#49C4E5" } });
 
   const handleNewColClick = () => {
     setIsModalOpen(true);
@@ -34,11 +36,18 @@ const Board = ({ board }: BoardProps) => {
 
   const handleCancelButton = () => {
     setIsModalOpen(false);
+    reset();
   };
 
   const onSubmit: SubmitHandler<Inputs> = async (data: Inputs) => {
-    await createColumn({ name: data.columnName, boardId: board.id, order: columns?.length as number });
+    await createColumn({
+      name: data.columnName,
+      boardId: board.id,
+      order: columns?.length as number,
+      color: data.color,
+    });
     setIsModalOpen(false);
+    reset();
   };
 
   return (
@@ -46,16 +55,21 @@ const Board = ({ board }: BoardProps) => {
       <Modal {...{ isModalOpen, setIsModalOpen }}>
         <form onSubmit={handleSubmit(onSubmit)} className="dark:bg-grey-very-dark p-8 rounded-sm">
           <h3 className="text-lg mb-5 font-bold">Add New Column</h3>
-          <input
-            {...register("columnName", { required: true })}
-            placeholder="e.g. Web Design"
-            type="text"
-            className={`w-full py-2 px-4 border-[1px] ${
-              errors.columnName ? "border-red animate-shake" : "border-lines-light dark:border-lines-dark"
-            } rounded-sm mb-5 dark:bg-grey-very-dark`}
-          />
+          <div className="flex">
+            <input
+              {...register("columnName", { required: true })}
+              placeholder="e.g. Web Design"
+              type="text"
+              className={`w-full py-2 px-4 border-[1px] ${
+                errors.columnName ? "border-red animate-shake" : "border-lines-light dark:border-lines-dark"
+              } rounded-sm mb-5 dark:bg-grey-very-dark`}
+            />
+            <input {...register("color")} type="color" className="w-6 h-6 ml-4 mt-2" />
+          </div>
           <div className="flex justify-between">
-            <Button type="submit">{isLoading ? <span className="animate-spin">0</span> : "Create"}</Button>
+            <Button isLoading={isLoading} type="submit">
+              Create
+            </Button>
             <Button onClick={handleCancelButton}>Cancel</Button>
           </div>
         </form>
