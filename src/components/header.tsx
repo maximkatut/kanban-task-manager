@@ -6,6 +6,7 @@ import DeleteModalInsert from "./deleteModalInsert";
 import DotsButton from "./dotsButton";
 import Modal from "./modal";
 import Logo from "./svg/logo";
+import TaskForm from "./taskForm";
 interface HeaderProps {
   isMenuOpen?: boolean;
 }
@@ -15,6 +16,7 @@ const Header = ({ isMenuOpen }: HeaderProps) => {
   const activeBoard = useStore((state) => state.activeBoard);
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState<boolean>(false);
+  const [isTaskModalOpen, setIsTaskModalOpen] = useState<boolean>(false);
   const [isDotsMenuOpen, setIsDotsMenuOpen] = useState<Boolean>(false);
   const clickDotsButtonHandler = () => {
     setIsDotsMenuOpen((prevState) => !prevState);
@@ -50,6 +52,9 @@ const Header = ({ isMenuOpen }: HeaderProps) => {
       <Modal isModalOpen={isDeleteModalOpen} setIsModalOpen={setIsDeleteModalOpen}>
         <DeleteModalInsert {...{ setIsDeleteModalOpen }} />
       </Modal>
+      <Modal isModalOpen={isTaskModalOpen} setIsModalOpen={setIsTaskModalOpen}>
+        <TaskForm setIsModalOpen={setIsTaskModalOpen} />
+      </Modal>
       <header className="flex items-center bg-white dark:bg-grey-dark fixed w-full top-0 left-0">
         <div
           className={`transition-all py-9 ${
@@ -61,7 +66,13 @@ const Header = ({ isMenuOpen }: HeaderProps) => {
         <div className="flex items-center justify-between flex-grow pl-10 pr-6">
           <h2 className="text-2xl font-bold">{activeBoard?.name}</h2>
           <div className="relative flex justify-between text-base">
-            <Button>+ Add New Task</Button>
+            <Button
+              onClick={() => {
+                setIsTaskModalOpen(true);
+              }}
+            >
+              + Add New Task
+            </Button>
             <DotsButton onClick={clickDotsButtonHandler} />
             {isDotsMenuOpen && (
               <div

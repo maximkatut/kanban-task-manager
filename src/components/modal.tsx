@@ -21,7 +21,7 @@ const Modal = ({ children, isModalOpen, setIsModalOpen }: ModalProps) => {
           right: "0",
           margin: "auto",
           width: "480px",
-          maxHeight: "500px",
+          maxHeight: "90vh",
           height: "min-content",
           padding: "0",
           border: "none",
