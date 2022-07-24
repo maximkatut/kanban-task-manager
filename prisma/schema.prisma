@@ -76,7 +76,7 @@ model Column {
     boardId String
     color   String
 
-    @@unique([id, name])
+    @@unique([id])
 }
 
 model Task {
@@ -86,7 +86,7 @@ model Task {
     status      String
     order       Int
     subtasks    Subtask[]
-    Column      Column    @relation(fields: [columnId, status], references: [id, name], onDelete: Cascade, onUpdate: Cascade)
+    Column      Column    @relation(fields: [columnId], references: [id], onDelete: Cascade, onUpdate: Cascade)
     columnId    String
 }
 
