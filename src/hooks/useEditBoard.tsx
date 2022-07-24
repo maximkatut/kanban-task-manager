@@ -1,5 +1,5 @@
 import { Board } from "@prisma/client";
-import { SubmitHandler, useFieldArray, useForm } from "react-hook-form";
+import { SubmitHandler, useFieldArray, useForm, UseFormSetError } from "react-hook-form";
 import { useStore } from "../store";
 import { findDuplicates } from "../utils/index";
 import { trpc } from "../utils/trpc";
@@ -11,6 +11,19 @@ interface columnData {
   name: string;
   color: string;
 }
+
+export const checkOnDublicates = (data: Inputs, setError: UseFormSetError<Inputs>) => {
+  const columnNames = data.column.map((c) => c.name);
+  const dublicates = findDuplicates(columnNames);
+  const inputIndex = columnNames.findIndex((it) => it === dublicates[0]);
+  if (dublicates.length > 0) {
+    setError(`column.${inputIndex}.name`, {
+      type: "custom",
+      message: "Two or more columns can't be with the same name",
+    });
+    return true;
+  }
+};
 
 const useEditBoard = ({ setIsModalOpen }: UseBoardProps) => {
   const activeBoard = useStore((state) => state.activeBoard) as Board;
@@ -61,14 +74,7 @@ const useEditBoard = ({ setIsModalOpen }: UseBoardProps) => {
 
   const onSubmit: SubmitHandler<Inputs> = async (data) => {
     let columnsNewArray: columnData[] = [];
-    const columnNames = data.column.map((c) => c.name);
-    const dublicates = findDuplicates(columnNames);
-    const inputIndex = columnNames.findIndex((it) => it === dublicates[0]);
-    if (dublicates.length > 0) {
-      setError(`column.${inputIndex}.name`, {
-        type: "custom",
-        message: "Two or more columns can't be with the same name",
-      });
+    if (checkOnDublicates(data, setError)) {
       return;
     }
 
