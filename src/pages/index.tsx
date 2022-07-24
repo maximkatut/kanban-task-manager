@@ -4,13 +4,14 @@ import { useEffect, useState } from "react";
 import BoardComponent from "../components/boardComponent";
 import Header from "../components/header";
 import Layout from "../components/layout";
+import Loader from "../components/loader";
 import Sidebar from "../components/sidebar";
 import { useStore } from "../store";
 import { trpc } from "../utils/trpc";
 
 const Home: NextPage = () => {
   const [isMenuOpen, setIsMenuOpen] = useState<boolean>(true);
-  const { data: boards } = trpc.useQuery(["board.getAll"]);
+  const { data: boards, isLoading } = trpc.useQuery(["board.getAll"]);
   const activeBoard = useStore((state) => state.activeBoard);
   const setActiveBoard = useStore((state) => state.setActiveBoard);
 
@@ -39,11 +40,7 @@ const Home: NextPage = () => {
           } transition-all bg-grey-light dark:bg-grey-very-dark min-h-[calc(100vh-98px)] min-w-[calc(100vw-75rem/4)]`}
         >
           <h1 className="visually-hidden">Kanban - Task Manager</h1>
-          {activeBoard ? (
-            <BoardComponent board={activeBoard} />
-          ) : (
-            <p className="bg-purple text-white p-3 text-base">Pick a board or create a new one...</p>
-          )}
+          {isLoading ? <Loader /> : activeBoard && <BoardComponent board={activeBoard} />}
         </main>
       </div>
     </Layout>
