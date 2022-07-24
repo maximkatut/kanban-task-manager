@@ -26,6 +26,7 @@ const Board = ({ board }: BoardProps) => {
   const {
     register,
     formState: { errors },
+    setError,
     handleSubmit,
     reset,
   } = useForm<Inputs>({ defaultValues: { columnName: "", color: "#49C4E5" } });
@@ -40,14 +41,20 @@ const Board = ({ board }: BoardProps) => {
   };
 
   const onSubmit: SubmitHandler<Inputs> = async (data: Inputs) => {
-    await createColumn({
-      name: data.columnName,
-      boardId: board.id,
-      order: columns?.length as number,
-      color: data.color,
-    });
-    setIsModalOpen(false);
-    reset();
+    const columnNames = columns?.map((c) => c.name.toLowerCase()) as string[];
+    if (columnNames.includes(data.columnName.toLowerCase())) {
+      setError("columnName", { type: "custom", message: "This name already exists" }, { shouldFocus: true });
+      return;
+    } else {
+      await createColumn({
+        name: data.columnName,
+        boardId: board.id,
+        order: columns?.length as number,
+        color: data.color,
+      });
+      setIsModalOpen(false);
+      reset();
+    }
   };
 
   return (
@@ -58,7 +65,7 @@ const Board = ({ board }: BoardProps) => {
           <div className="flex">
             <input
               {...register("columnName", { required: true })}
-              placeholder="e.g. Web Design"
+              placeholder="e.g. Has To Be Done"
               type="text"
               className={`w-full py-2 px-4 border-[1px] ${
                 errors.columnName ? "border-red animate-shake" : "border-lines-light dark:border-lines-dark"
@@ -66,9 +73,10 @@ const Board = ({ board }: BoardProps) => {
             />
             <input {...register("color")} type="color" className="w-6 h-6 ml-4 mt-2" />
           </div>
+          {errors.columnName?.message && <p className="text-red-hover -mt-5">{errors.columnName?.message}</p>}
           <div className="flex justify-between">
             <Button isLoading={isLoading} type="submit">
-              Create
+              Add
             </Button>
             <Button onClick={handleCancelButton}>Cancel</Button>
           </div>

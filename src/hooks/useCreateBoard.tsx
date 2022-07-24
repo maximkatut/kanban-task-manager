@@ -19,7 +19,7 @@ const useCreateBoard = ({ setIsModalOpen }: UseBoardProps) => {
   const activeBoard = useStore((state) => state.activeBoard);
   const setActiveBoard = useStore((state) => state.setActiveBoard);
   const utils = trpc.useContext();
-  const { mutateAsync: createTask } = trpc.useMutation("column.create", {
+  const { mutateAsync: createColumn } = trpc.useMutation("column.create", {
     async onSuccess() {
       activeBoard && (await utils.invalidateQueries(["column.getByBoardId", { boardId: activeBoard.id }]));
     },
@@ -32,7 +32,7 @@ const useCreateBoard = ({ setIsModalOpen }: UseBoardProps) => {
       });
       const inputs = getValues();
       inputs.column.map(async (c, i) => {
-        await createTask({ ...c, boardId: data.id, order: i });
+        await createColumn({ ...c, boardId: data.id, order: i });
       });
     },
   });

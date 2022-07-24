@@ -1,6 +1,7 @@
 import { Board } from "@prisma/client";
 import { SubmitHandler, useFieldArray, useForm } from "react-hook-form";
 import { useStore } from "../store";
+import { findDuplicates } from "../utils/index";
 import { trpc } from "../utils/trpc";
 import { Inputs, UseBoardProps } from "./useCreateBoard";
 
@@ -44,6 +45,7 @@ const useEditBoard = ({ setIsModalOpen }: UseBoardProps) => {
     register,
     handleSubmit,
     control,
+    setError,
     formState: { errors },
   } = useForm<Inputs>({
     defaultValues: {
@@ -59,11 +61,20 @@ const useEditBoard = ({ setIsModalOpen }: UseBoardProps) => {
 
   const onSubmit: SubmitHandler<Inputs> = async (data) => {
     let columnsNewArray: columnData[] = [];
+    const columnNames = data.column.map((c) => c.name);
+    const dublicates = findDuplicates(columnNames);
+    const inputIndex = columnNames.findIndex((it) => it === dublicates[0]);
+    if (dublicates.length > 0) {
+      setError(`column.${inputIndex}.name`, {
+        type: "custom",
+        message: "Two or more columns can't be with the same name",
+      });
+      return;
+    }
 
     if (activeBoard.name !== data.boardName) {
       await updateBoard({ boardName: data.boardName, boardId: activeBoard?.id });
     }
-    console.log(data.column);
     data.column.forEach((newColumn, newIndex) => {
       columns?.forEach((oldColumn, oldIndex) => {
         if (newIndex === oldIndex) {
