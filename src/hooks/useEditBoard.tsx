@@ -1,4 +1,5 @@
 import { Board } from "@prisma/client";
+import { useState } from "react";
 import { SubmitHandler, useFieldArray, useForm, UseFormSetError } from "react-hook-form";
 import { useStore } from "../store";
 import { findDuplicates } from "../utils/index";
@@ -28,6 +29,8 @@ export const checkOnDublicates = (data: Inputs, setError: UseFormSetError<Inputs
 const useEditBoard = ({ setIsModalOpen }: UseBoardProps) => {
   const activeBoard = useStore((state) => state.activeBoard) as Board;
   const setActiveBoard = useStore((state) => state.setActiveBoard);
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState<boolean>(false);
+  const [index, setIndex] = useState<number>(0);
   const utils = trpc.useContext();
   const { data: columns } = trpc.useQuery(["column.getByBoardId", { boardId: activeBoard?.id as string }]);
   const { mutateAsync: createColumn } = trpc.useMutation("column.create", {
@@ -81,6 +84,7 @@ const useEditBoard = ({ setIsModalOpen }: UseBoardProps) => {
     if (activeBoard.name !== data.boardName) {
       await updateBoard({ boardName: data.boardName, boardId: activeBoard?.id });
     }
+
     data.column.forEach((newColumn, newIndex) => {
       columns?.forEach((oldColumn, oldIndex) => {
         if (newIndex === oldIndex) {
@@ -117,12 +121,23 @@ const useEditBoard = ({ setIsModalOpen }: UseBoardProps) => {
   };
 
   const handleRemoveCrossButton = (i: number) => {
-    remove(i);
-    columns && deleteColumn({ id: columns[i]?.id as string });
+    if (columns && columns[i]) {
+      setIsDeleteModalOpen(true);
+      setIndex(i);
+    } else {
+      remove(i);
+    }
   };
 
   const handleNewColumnButton = () => {
     append({ name: "" });
+  };
+
+  const handleDeleteColumnButton = () => {
+    const i = index;
+    columns && deleteColumn({ id: columns[i]?.id as string });
+    setIsDeleteModalOpen(false);
+    remove(i);
   };
 
   return {
@@ -132,6 +147,9 @@ const useEditBoard = ({ setIsModalOpen }: UseBoardProps) => {
     handleNewColumnButtonEdit: handleNewColumnButton,
     errorsEdit: errors,
     registerEdit: register,
+    isDeleteModalOpen,
+    setIsDeleteModalOpen,
+    handleDeleteColumnButton,
   };
 };
 export default useEditBoard;
