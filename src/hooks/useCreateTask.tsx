@@ -19,10 +19,14 @@ const useCreateTask = ({ setIsModalOpen }: UseTaskProps) => {
   const activeBoard = useStore((state) => state.activeBoard);
   const utils = trpc.useContext();
   const { data: columns } = trpc.useQuery(["column.getByBoardId", { boardId: activeBoard?.id as string }]);
-  // const { data: tasks } = trpc.useQuery(["task.getByColumnId"]);
-  const { mutate: createTask } = trpc.useMutation("task.create", {
+  const { mutateAsync: createTask } = trpc.useMutation("task.create", {
     async onSuccess(data) {
       await utils.invalidateQueries(["task.getByColumnId", { columnId: data.columnId }]);
+    },
+  });
+  const { mutateAsync: createSubtask } = trpc.useMutation("subtask.create", {
+    async onSuccess(data) {
+      await utils.invalidateQueries(["subtask.getByTaskId", { taskId: data.taskId }]);
     },
   });
   const {
@@ -43,15 +47,30 @@ const useCreateTask = ({ setIsModalOpen }: UseTaskProps) => {
     name: "subtasks" as never,
   });
 
-  const onSubmit: SubmitHandler<Inputs> = (data) => {
+  const onSubmit: SubmitHandler<Inputs> = async (data) => {
     const column = columns?.find((c) => c.name === data.status);
-    createTask({
-      title: data.title,
-      description: data.description,
-      columnId: column?.id as string,
-      status: data.status,
-      order: 0,
-    });
+    await createTask(
+      {
+        title: data.title,
+        description: data.description,
+        columnId: column?.id as string,
+        status: data.status,
+        order: 0,
+      },
+      {
+        async onSuccess({ id }) {
+          data.subtasks.forEach(async (sub, i) => {
+            await createSubtask({
+              name: sub.name,
+              order: i,
+              taskId: id,
+              isCompleted: false,
+            });
+          });
+        },
+      }
+    );
+
     setIsModalOpen(false);
   };
 
