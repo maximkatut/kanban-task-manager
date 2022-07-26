@@ -1,9 +1,10 @@
-import { useEffect, useRef, useState } from "react";
+import { useState } from "react";
 import { useStore } from "../store/index";
 import BoardForm from "./boardForm";
 import Button from "./button";
 import DeleteModalInsert from "./deleteModalInsert";
 import DotsButton from "./dotsButton";
+import DotsMenu from "./dotsMenu";
 import Modal from "./modal";
 import Logo from "./svg/logo";
 import TaskForm from "./taskForm";
@@ -12,7 +13,6 @@ interface HeaderProps {
 }
 
 const Header = ({ isMenuOpen }: HeaderProps) => {
-  const ref = useRef<HTMLDivElement | null>(null);
   const activeBoard = useStore((state) => state.activeBoard);
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState<boolean>(false);
@@ -22,24 +22,12 @@ const Header = ({ isMenuOpen }: HeaderProps) => {
     setIsDotsMenuOpen((prevState) => !prevState);
   };
 
-  useEffect(() => {
-    const handleOutsideClick = (e: any) => {
-      if (ref.current && !ref.current.contains(e.target)) {
-        setIsDotsMenuOpen(false);
-      }
-    };
-    document.addEventListener("mousedown", handleOutsideClick);
-    return () => {
-      document.removeEventListener("mousedown", handleOutsideClick);
-    };
-  }, []);
-
   const handleEditClick = () => {
     setIsModalOpen(true);
     setIsDotsMenuOpen(false);
   };
 
-  const handleDeletetClick = () => {
+  const handleDeleteClick = () => {
     setIsDeleteModalOpen(true);
     setIsDotsMenuOpen(false);
   };
@@ -75,17 +63,12 @@ const Header = ({ isMenuOpen }: HeaderProps) => {
             </Button>
             <DotsButton onClick={clickDotsButtonHandler} />
             {isDotsMenuOpen && (
-              <div
-                ref={ref}
-                className="absolute top-20 left-0 w-48 px-6 py-4 flex flex-col bg-white dark:bg-grey-very-dark rounded-lg"
-              >
-                <button onClick={handleEditClick} className="text-grey-medium text-left mb-2">
-                  Edit Board
-                </button>
-                <button onClick={handleDeletetClick} className="text-red text-left">
-                  Delete Board
-                </button>
-              </div>
+              <DotsMenu
+                position={"top-20 left-0"}
+                setIsDotsMenuOpen={setIsDotsMenuOpen}
+                handleDeleteClick={handleDeleteClick}
+                handleEditClick={handleEditClick}
+              />
             )}
           </div>
         </div>
