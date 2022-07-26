@@ -5,7 +5,7 @@ import Button from "./button";
 
 interface DeleteModalInsertProps {
   setIsDeleteModalOpen: (x: boolean) => void;
-  handleDeleteColumnButton: () => void;
+  handleDeleteColumnButton?: () => void;
   column?: boolean;
 }
 
