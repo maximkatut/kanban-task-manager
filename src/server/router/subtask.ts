@@ -31,4 +31,38 @@ export const subtaskRouter = createRouter()
         },
       });
     },
+  })
+  .mutation("update", {
+    input: z.object({
+      id: z.string(),
+      name: z.string().optional(),
+      taskId: z.string().optional(),
+      isCompleted: z.boolean().optional(),
+      order: z.number().optional(),
+    }),
+    async resolve({ input, ctx }) {
+      return await ctx.prisma.subtask.update({
+        where: {
+          id: input.id,
+        },
+        data: {
+          title: input.name,
+          taskId: input.taskId,
+          isCompleted: input.isCompleted,
+          order: input.order,
+        },
+      });
+    },
+  })
+  .mutation("delete", {
+    input: z.object({
+      id: z.string(),
+    }),
+    async resolve({ input, ctx }) {
+      return await ctx.prisma.subtask.delete({
+        where: {
+          id: input.id,
+        },
+      });
+    },
   });

@@ -37,10 +37,11 @@ export const taskRouter = createRouter()
   .mutation("update", {
     input: z.object({
       id: z.string(),
-      title: z.string(),
-      columnId: z.string(),
-      columnName: z.string(),
-      order: z.number(),
+      title: z.string().optional(),
+      columnId: z.string().optional(),
+      description: z.string().optional(),
+      status: z.string().optional(),
+      order: z.number().optional(),
     }),
     async resolve({ input, ctx }) {
       return await ctx.prisma.task.update({
@@ -49,7 +50,8 @@ export const taskRouter = createRouter()
         },
         data: {
           title: input.title,
-          status: input.columnName,
+          status: input.status,
+          description: input.description,
           columnId: input.columnId,
           order: input.order,
         },
