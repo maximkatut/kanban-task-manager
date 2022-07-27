@@ -51,7 +51,7 @@ const BoardForm = ({ setIsModalOpen, isEditMode }: BoardFormProps) => {
           <DeleteModalInsert
             column
             setIsDeleteModalOpen={setIsDeleteModalOpen}
-            handleDeleteColumnButton={handleDeleteColumnButton}
+            handleDeleteButton={handleDeleteColumnButton}
           />
         </Modal>
       )}
@@ -67,7 +67,7 @@ const BoardForm = ({ setIsModalOpen, isEditMode }: BoardFormProps) => {
           id="name"
           className={`w-full py-2 px-4 border-[1px] ${
             errors.boardName ? "border-red animate-shake" : "border-lines-light dark:border-lines-dark"
-          } rounded-sm mb-5 dark:bg-grey-very-dark`}
+          } hover:border-purple rounded-sm mb-5 dark:bg-grey-very-dark`}
         />
         <label className="text-grey-medium text-xs block mb-2">Board Columns</label>
         {fields.map((f, i) => {
@@ -83,7 +83,7 @@ const BoardForm = ({ setIsModalOpen, isEditMode }: BoardFormProps) => {
                     errors?.[`column`]?.[`${i}`]
                       ? "border-red animate-shake"
                       : "border-lines-light dark:border-lines-dark"
-                  } rounded-sm mb-2 dark:bg-grey-very-dark`}
+                  } hover:border-purple rounded-sm mb-2 dark:bg-grey-very-dark`}
                 />
                 <input
                   {...register(`column.${i}.color` as const, { required: true })}
@@ -100,7 +100,7 @@ const BoardForm = ({ setIsModalOpen, isEditMode }: BoardFormProps) => {
                   }}
                 >
                   <svg width="15" height="15" xmlns="http://www.w3.org/2000/svg">
-                    <g fill="#828FA3" fillRule="evenodd">
+                    <g className="hover:fill-red" fill="#828FA3" fillRule="evenodd">
                       <path d="m12.728 0 2.122 2.122L2.122 14.85 0 12.728z" />
                       <path d="M0 2.122 2.122 0 14.85 12.728l-2.122 2.122z" />
                     </g>

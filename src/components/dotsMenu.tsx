@@ -26,7 +26,7 @@ const DotsMenu = ({ setIsDotsMenuOpen, handleEditClick, handleDeleteClick, posit
   return (
     <div
       ref={ref}
-      className={`shadow-lg absolute ${position} w-48 px-6 py-4 flex flex-col bg-white dark:bg-grey-very-dark rounded-lg`}
+      className={`text-base shadow-lg absolute ${position} w-48 px-6 py-4 flex flex-col bg-white dark:bg-grey-very-dark rounded-lg`}
     >
       <button onClick={handleEditClick} className="text-grey-medium text-left mb-2">
         Edit {name}

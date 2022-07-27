@@ -5,11 +5,12 @@ import Button from "./button";
 
 interface DeleteModalInsertProps {
   setIsDeleteModalOpen: (x: boolean) => void;
-  handleDeleteColumnButton?: () => void;
+  handleDeleteButton?: () => void;
   column?: boolean;
+  task?: boolean;
 }
 
-const DeleteModalInsert = ({ setIsDeleteModalOpen, column, handleDeleteColumnButton }: DeleteModalInsertProps) => {
+const DeleteModalInsert = ({ setIsDeleteModalOpen, column, task, handleDeleteButton }: DeleteModalInsertProps) => {
   const activeBoard = useStore((state) => state.activeBoard) as Board;
   const setActiveBoard = useStore((state) => state.setActiveBoard);
   const client = trpc.useContext();
@@ -29,16 +30,16 @@ const DeleteModalInsert = ({ setIsDeleteModalOpen, column, handleDeleteColumnBut
   };
   return (
     <div className="dark:bg-grey-very-dark p-8 rounded-sm">
-      <h2 className="text-red mb-5 text-lg">Delete this {column ? "column" : "board"}?</h2>
+      <h2 className="text-red mb-5 text-lg">Delete this {column ? "column" : task ? "task" : "board"}?</h2>
       <p className="text-grey-medium mb-5">
         {`Are you sure you want to delete the ${
-          column ? "column" : `${activeBoard.name} board`
-        }? This action will remove all ${column ? "" : "columns and"} tasks and
+          column ? "column" : task ? "task" : `${activeBoard.name} board`
+        }? This action will remove ${task ? "the task" : `all ${column ? "" : "columns and"} tasks`} and
         cannot be reversed.`}
       </p>
       <div className="flex justify-between">
         <Button
-          onClick={column ? handleDeleteColumnButton : handleDeleteBoardClick}
+          onClick={column || task ? handleDeleteButton : handleDeleteBoardClick}
           styles="rounded-full px-6 py-3 text-white bg-red hover:bg-red-hover w-48"
         >
           Delete
