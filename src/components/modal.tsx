@@ -25,7 +25,6 @@ const Modal = ({ children, isModalOpen, setIsModalOpen }: ModalProps) => {
           height: "min-content",
           padding: "0",
           border: "none",
-          overflow: "scroll",
         },
         overlay: { zIndex: "10", backgroundColor: "rgba(0,0,0,0.5)" },
       }}
