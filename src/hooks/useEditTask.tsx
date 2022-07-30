@@ -1,4 +1,4 @@
-import { Board, Task } from "@prisma/client";
+import { Board, Subtask, Task } from "@prisma/client";
 import { SubmitHandler, useFieldArray, useForm } from "react-hook-form";
 import { useStore } from "../store";
 import { trpc } from "../utils/trpc";
@@ -6,9 +6,7 @@ import { trpc } from "../utils/trpc";
 export interface Inputs {
   title: string;
   description: string;
-  subtasks: {
-    name: string;
-  }[];
+  subtasks: Subtask[];
   status: string;
 }
 
@@ -22,13 +20,18 @@ const useEditTask = ({ setIsModalOpen, task }: UseTaskProps) => {
   const utils = trpc.useContext();
   const { data: columns } = trpc.useQuery(["column.getByBoardId", { boardId: activeBoard?.id as string }]);
   const { data: subtasks } = trpc.useQuery(["subtask.getByTaskId", { taskId: task?.id as string }]);
-  const { mutateAsync: updateTask } = trpc.useMutation("task.update", {
+  const { mutateAsync: updateTask, isLoading: isLoadingTask } = trpc.useMutation("task.update", {
     async onSuccess(data) {
       await utils.invalidateQueries(["task.getByColumnId", { columnId: data.columnId }]);
       task && (await utils.invalidateQueries(["task.getByColumnId", { columnId: task?.columnId }]));
     },
   });
-  const { mutateAsync: createSubtask } = trpc.useMutation("subtask.create", {
+  const { mutateAsync: createSubtask, isLoading: isLoadingSubtask } = trpc.useMutation("subtask.create", {
+    async onSuccess(data) {
+      await utils.invalidateQueries(["subtask.getByTaskId", { taskId: data.taskId }]);
+    },
+  });
+  const { mutateAsync: updateSubtask, isLoading: isLoadingSubtaskUpdate } = trpc.useMutation("subtask.update", {
     async onSuccess(data) {
       await utils.invalidateQueries(["subtask.getByTaskId", { taskId: data.taskId }]);
     },
@@ -38,8 +41,7 @@ const useEditTask = ({ setIsModalOpen, task }: UseTaskProps) => {
       await utils.invalidateQueries(["subtask.getByTaskId", { taskId: data.taskId }]);
     },
   });
-  const subtasksObjectNames = subtasks && subtasks?.map((s) => ({ name: s.title }));
-  const subtasksNames = subtasks && subtasks?.map((s) => s.title);
+
   const {
     register,
     handleSubmit,
@@ -49,7 +51,7 @@ const useEditTask = ({ setIsModalOpen, task }: UseTaskProps) => {
     defaultValues: {
       title: task?.title,
       description: task?.description as string,
-      subtasks: subtasksObjectNames,
+      subtasks: subtasks,
       status: task?.status,
     },
   });
@@ -61,41 +63,48 @@ const useEditTask = ({ setIsModalOpen, task }: UseTaskProps) => {
 
   const onSubmit: SubmitHandler<Inputs> = async (data) => {
     const column = columns?.find((c) => c.name === data.status);
-    await updateTask(
-      {
-        id: task?.id as string,
-        title: data.title,
-        description: data.description,
-        columnId: column?.id as string,
-        status: data.status,
-      },
-      {
-        async onSuccess({ id }) {
-          data.subtasks.forEach(async (sub, i) => {
-            if (subtasksNames?.includes(sub.name)) {
-              return;
-            }
 
-            await createSubtask({
-              name: sub.name,
-              order: i,
-              taskId: id,
-              isCompleted: false,
-            });
-          });
-        },
+    await updateTask({
+      id: task?.id as string,
+      title: data.title,
+      description: data.description,
+      columnId: column?.id as string,
+      status: data.status,
+    });
+
+    for (let i = 0; i < data.subtasks.length; i++) {
+      const subtask = data.subtasks[i];
+      if (subtask?.id) {
+        await updateSubtask({
+          id: subtask.id,
+          order: i,
+          title: subtask.title,
+        });
+      } else {
+        createSubtask({
+          title: subtask?.title as string,
+          order: i,
+          taskId: task?.id as string,
+          isCompleted: false,
+        });
       }
-    );
+    }
 
     setIsModalOpen(false);
   };
 
   const handleRemoveCrossButton = (i: number) => {
     remove(i);
+    const subtaskId = subtasks && subtasks[i]?.id;
+    if (subtaskId) {
+      deleteSubtask({
+        id: subtaskId,
+      });
+    }
   };
 
   const handleNewSubtaskButton = () => {
-    append({ name: "" });
+    append({ title: "" });
   };
 
   return {
@@ -105,6 +114,7 @@ const useEditTask = ({ setIsModalOpen, task }: UseTaskProps) => {
     handleNewSubtaskButtonEdit: handleNewSubtaskButton,
     errorsEdit: errors,
     registerEdit: register,
+    isLoading: isLoadingSubtask || isLoadingSubtaskUpdate || isLoadingTask,
   };
 };
 
