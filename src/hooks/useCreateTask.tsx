@@ -1,3 +1,4 @@
+import { Subtask } from "@prisma/client";
 import { SubmitHandler, useFieldArray, useForm } from "react-hook-form";
 import { useStore } from "../store";
 import { trpc } from "../utils/trpc";
@@ -5,9 +6,7 @@ import { trpc } from "../utils/trpc";
 export interface Inputs {
   title: string;
   description: string;
-  subtasks: {
-    name: string;
-  }[];
+  subtasks: Subtask[];
   status: string;
 }
 
@@ -38,7 +37,7 @@ const useCreateTask = ({ setIsModalOpen }: UseTaskProps) => {
     defaultValues: {
       title: "",
       description: "",
-      subtasks: [{ name: "" }, { name: "" }],
+      subtasks: [{ title: "" }, { title: "" }],
     },
   });
 
@@ -46,7 +45,6 @@ const useCreateTask = ({ setIsModalOpen }: UseTaskProps) => {
     control,
     name: "subtasks" as never,
   });
-  // !! обновление таски и колонки
   const onSubmit: SubmitHandler<Inputs> = async (data) => {
     const column = columns?.find((c) => c.name.toLowerCase() === data.status.toLowerCase());
     await createTask(
@@ -61,7 +59,7 @@ const useCreateTask = ({ setIsModalOpen }: UseTaskProps) => {
         async onSuccess({ id }) {
           data.subtasks.forEach(async (sub, i) => {
             await createSubtask({
-              name: sub.name,
+              title: sub.title,
               order: i,
               taskId: id,
               isCompleted: false,

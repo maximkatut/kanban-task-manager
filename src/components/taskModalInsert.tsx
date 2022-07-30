@@ -16,7 +16,7 @@ interface TaskModalInsertProps {
 
 interface Inputs {
   status: string;
-  checkbox: string[];
+  checkbox: boolean[];
 }
 
 const TaskModalInsert = ({ subtasks, task }: TaskModalInsertProps) => {
@@ -42,10 +42,10 @@ const TaskModalInsert = ({ subtasks, task }: TaskModalInsertProps) => {
       await utils.invalidateQueries(["subtask.getByTaskId", { taskId: data.taskId }]);
     },
   });
-  const activeSubtasksIds = subtasks.filter((s) => s.isCompleted === true).map((s) => s.id);
+  const activeSubtasks = subtasks.map((s) => s.isCompleted === true);
   const activeColumn = columns?.find((c) => c.id === task.columnId) as Column;
-  const { register, handleSubmit } = useForm({
-    defaultValues: { checkbox: [...activeSubtasksIds], status: activeColumn.name },
+  const { register } = useForm<Inputs>({
+    defaultValues: { checkbox: activeSubtasks },
   });
 
   const clickDotsButtonHandler = () => {
@@ -66,6 +66,25 @@ const TaskModalInsert = ({ subtasks, task }: TaskModalInsertProps) => {
     deleteTask({ id: task.id });
   };
 
+  const handleSelectChange = (e: any) => {
+    const status = e.target.value;
+    const column = columns?.find((c) => c.name === status);
+    if (task.status !== status) {
+      updateTask({
+        id: task.id,
+        status: status,
+        columnId: column?.id,
+      });
+    }
+  };
+
+  const handleCheckboxChange = (e: any) => {
+    const checkbox = e.target;
+    updateSubtask({
+      id: checkbox.id,
+      isCompleted: checkbox.checked,
+    });
+  };
   return (
     <>
       <Modal isModalOpen={isDeleteModalOpen} setIsModalOpen={setIsDeleteModalOpen}>
@@ -89,25 +108,7 @@ const TaskModalInsert = ({ subtasks, task }: TaskModalInsertProps) => {
           )}
         </div>
         <p className="text-grey-medium mb-6">{task.description}</p>
-        <form
-          onChange={() => {
-            handleSubmit((data) => {
-              const column = columns?.find((c) => c.name === data.status);
-              if (task.status !== data.status) {
-                updateTask({
-                  id: task.id,
-                  status: data.status,
-                  columnId: column?.id,
-                });
-              }
-              if (task.status !== data.status) {
-                updateTask({
-                  id: task.id,
-                });
-              }
-            })();
-          }}
-        >
+        <form>
           <p className="text-grey-medium text-xs mb-2 font-bold">
             Subtasks (
             {subtasks?.reduce((acc, s) => {
@@ -120,7 +121,7 @@ const TaskModalInsert = ({ subtasks, task }: TaskModalInsertProps) => {
           </p>
           {subtasks
             .sort((a, b) => a.order - b.order)
-            .map((s) => (
+            .map((s, i) => (
               <label
                 htmlFor={s.id}
                 key={s.id}
@@ -129,17 +130,7 @@ const TaskModalInsert = ({ subtasks, task }: TaskModalInsertProps) => {
                 } text-grey-medium dark:text-white bg-purple-10 p-4 text-xs block mb-2 hover:bg-purple-25 cursor-pointer`}
               >
                 <input
-                  {...register("checkbox", {
-                    onChange(event) {
-                      const checkbox = event.target;
-                      updateSubtask({
-                        id: checkbox.id,
-                        isCompleted: checkbox.checked,
-                      });
-                      console.log(event.currentTarget.value);
-                      console.log(event.target.checked);
-                    },
-                  })}
+                  {...(register(`checkbox.${i}`), { onChange: handleCheckboxChange })}
                   defaultChecked={s.isCompleted}
                   id={s.id}
                   key={s.id}
@@ -151,8 +142,9 @@ const TaskModalInsert = ({ subtasks, task }: TaskModalInsertProps) => {
             ))}
           <label className="text-grey-medium text-xs block mt-6 mb-2 font-bold">Current Status</label>
           <select
-            {...register("status")}
+            {...(register("status"), { onChange: handleSelectChange })}
             id="status"
+            defaultValue={activeColumn.name}
             className={`hover:border-purple w-full py-3 px-4 border-[1px] bg-white uppercase border-lines-light dark:border-lines-dark rounded-sm mb-5 dark:bg-grey-very-dark`}
           >
             {columns?.map((c) => (
