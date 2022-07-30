@@ -75,18 +75,18 @@ const BoardForm = ({ setIsModalOpen, isEditMode }: BoardFormProps) => {
             <div key={f.id}>
               <div className="flex justify-between items-center">
                 <input
-                  {...register(`column.${i}.name` as const, { required: true })}
+                  {...register(`columns.${i}.name` as const, { required: true })}
                   placeholder="Column name..."
                   type="text"
                   id="column"
                   className={`w-[85%] py-2 px-4 border-[1px] ${
-                    errors?.[`column`]?.[`${i}`]
+                    errors?.[`columns`]?.[`${i}`]
                       ? "border-red animate-shake"
                       : "border-lines-light dark:border-lines-dark"
                   } hover:border-purple rounded-sm mb-2 dark:bg-grey-very-dark`}
                 />
                 <input
-                  {...register(`column.${i}.color` as const, { required: true })}
+                  {...register(`columns.${i}.color` as const, { required: true })}
                   type="color"
                   defaultValue={"#FF9898"}
                   className={`w-6 h-6 mb-2`}
@@ -107,8 +107,8 @@ const BoardForm = ({ setIsModalOpen, isEditMode }: BoardFormProps) => {
                   </svg>
                 </button>
               </div>
-              {errors.column?.[`${i}`]?.name?.type === "custom" && (
-                <p className="text-red-hover">{errors.column?.[`${i}`]?.name?.message}</p>
+              {errors.columns?.[`${i}`]?.name?.type === "custom" && (
+                <p className="text-red-hover">{errors.columns?.[`${i}`]?.name?.message}</p>
               )}
             </div>
           );

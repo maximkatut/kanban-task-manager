@@ -1,3 +1,4 @@
+import { Column } from "@prisma/client";
 import { SubmitHandler, useFieldArray, useForm } from "react-hook-form";
 import { useStore } from "../store";
 import { COLORS } from "../utils/const";
@@ -6,10 +7,7 @@ import { checkOnDublicates } from "./useEditBoard";
 
 export interface Inputs {
   boardName: string;
-  column: {
-    name: string;
-    color: string;
-  }[];
+  columns: Column[];
 }
 
 export interface UseBoardProps {
@@ -32,7 +30,7 @@ const useCreateBoard = ({ setIsModalOpen }: UseBoardProps) => {
         setActiveBoard(data);
       });
       const inputs = getValues();
-      inputs.column.map(async (c, i) => {
+      inputs.columns.map(async (c, i) => {
         await createColumn({ ...c, boardId: data.id, order: i });
       });
     },
@@ -47,7 +45,7 @@ const useCreateBoard = ({ setIsModalOpen }: UseBoardProps) => {
   } = useForm<Inputs>({
     defaultValues: {
       boardName: "",
-      column: [
+      columns: [
         { name: "", color: COLORS[0] },
         { name: "", color: COLORS[1] },
       ],
