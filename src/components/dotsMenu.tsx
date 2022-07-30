@@ -28,10 +28,10 @@ const DotsMenu = ({ setIsDotsMenuOpen, handleEditClick, handleDeleteClick, posit
       ref={ref}
       className={`text-base shadow-lg absolute ${position} w-48 px-6 py-4 flex flex-col bg-white dark:bg-grey-very-dark rounded-lg`}
     >
-      <button onClick={handleEditClick} className="text-grey-medium text-left mb-2">
+      <button onClick={handleEditClick} className="text-grey-medium text-left mb-2 hover:font-bold">
         Edit {name}
       </button>
-      <button onClick={handleDeleteClick} className="text-red text-left">
+      <button onClick={handleDeleteClick} className="text-red text-left hover:font-bold">
         Delete {name}
       </button>
     </div>
