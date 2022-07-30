@@ -14,7 +14,6 @@ interface TaskFormProps {
 const TaskForm = ({ task, isEditMode, setIsModalOpen }: TaskFormProps) => {
   const activeBoard = useStore((state) => state.activeBoard);
   const { data: columns } = trpc.useQuery(["column.getByBoardId", { boardId: activeBoard?.id as string }]);
-
   const {
     onCreateSubmit,
     registerCreate,
@@ -33,6 +32,7 @@ const TaskForm = ({ task, isEditMode, setIsModalOpen }: TaskFormProps) => {
     fieldsEdit,
     handleNewSubtaskButtonEdit,
     handleRemoveCrossButtonEdit,
+    isLoading,
   } = useEditTask({
     setIsModalOpen,
     task,
@@ -72,16 +72,20 @@ const TaskForm = ({ task, isEditMode, setIsModalOpen }: TaskFormProps) => {
       <label className="text-grey-medium text-xs block mb-2">Subtasks</label>
       {fields.map((f, i) => {
         return (
-          <div className="flex justify-between items-center" key={f.id}>
+          <div
+            className={`relative flex justify-between items-center ${
+              errors?.[`subtasks`]?.[`${i}`] &&
+              "animate-shake before:content-['Can`t_be_empty'] before:text-red before:absolute before:top-2 before:right-10 before:z-10"
+            } `}
+            key={f.id}
+          >
             <input
-              {...register(`subtasks.${i}.name` as const, { required: true })}
+              {...register(`subtasks.${i}.title` as const, { required: true })}
               placeholder="Subtask name..."
               type="text"
               id="subtask"
-              className={`hover:border-purple w-[93%] py-2 px-4 border-[1px] ${
-                errors?.[`subtasks`]?.[`${i}`]
-                  ? "border-red animate-shake"
-                  : "border-lines-light dark:border-lines-dark"
+              className={`relative hover:border-purple w-[93%] py-2 px-4 border-[1px] ${
+                errors?.[`subtasks`]?.[`${i}`] ? "border-red" : "border-lines-light dark:border-lines-dark"
               } rounded-sm mb-2 dark:bg-grey-very-dark`}
             />
             <button
@@ -124,7 +128,10 @@ const TaskForm = ({ task, isEditMode, setIsModalOpen }: TaskFormProps) => {
 
       <Button
         type="submit"
-        styles="mr-4 rounded-full px-6 py-3 font-bold text-white bg-purple hover:bg-purple-hover w-full"
+        isLoading={isLoading}
+        styles={`mr-4 rounded-full px-6 py-3 font-bold text-white w-full ${
+          isLoading ? "bg-purple-25" : "bg-purple hover:bg-purple-hover"
+        }`}
       >
         {isEditMode ? `Save changes` : "Create Task"}
       </Button>
