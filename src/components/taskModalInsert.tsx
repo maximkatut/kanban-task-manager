@@ -109,16 +109,18 @@ const TaskModalInsert = ({ subtasks, task }: TaskModalInsertProps) => {
         </div>
         <p className="text-grey-medium mb-6">{task.description}</p>
         <form>
-          <p className="text-grey-medium text-xs mb-2 font-bold">
-            Subtasks (
-            {subtasks?.reduce((acc, s) => {
-              if (s.isCompleted === true) {
-                acc++;
-              }
-              return acc;
-            }, 0)}{" "}
-            of {subtasks?.length})
-          </p>
+          {subtasks.length > 0 && (
+            <p className="text-grey-medium text-xs mb-2 font-bold">
+              Subtasks (
+              {subtasks?.reduce((acc, s) => {
+                if (s.isCompleted === true) {
+                  acc++;
+                }
+                return acc;
+              }, 0)}{" "}
+              of {subtasks?.length})
+            </p>
+          )}
           {subtasks
             .sort((a, b) => a.order - b.order)
             .map((s, i) => (
