@@ -3,6 +3,7 @@ import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { useStore } from "../store/index";
 import { trpc } from "../utils/trpc";
+import Checkbox from "./checkbox";
 import DeleteModalInsert from "./deleteModalInsert";
 import DotsButton from "./dotsButton";
 import DotsMenu from "./dotsMenu";
@@ -127,11 +128,13 @@ const TaskModalInsert = ({ subtasks, task }: TaskModalInsertProps) => {
               <label
                 htmlFor={s.id}
                 key={s.id}
-                className={`${
+                className={`flex ${
                   s.isCompleted ? "line-through" : "font-bold text-black"
                 } text-grey-medium dark:text-white bg-purple-10 p-4 text-xs block mb-2 hover:bg-purple-25 cursor-pointer`}
               >
+                <Checkbox isChecked={s.isCompleted} />
                 <input
+                  className="hidden"
                   {...(register(`checkbox.${i}`), { onChange: handleCheckboxChange })}
                   defaultChecked={s.isCompleted}
                   id={s.id}
