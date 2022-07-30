@@ -7,12 +7,8 @@ generator client {
 
 datasource db {
     provider = "sqlite"
-    url      = "file:./db.sqlite?connect_timeout=3000"
+    url      = "file:./db.sqlite"
     // url      = env("DATABASE_URL")
-}
-
-model Example {
-    id String @id @default(cuid())
 }
 
 // Necessary for Next auth
