@@ -35,9 +35,9 @@ export const columnRouter = createRouter()
   .mutation("update", {
     input: z.object({
       id: z.string(),
-      name: z.string(),
-      order: z.number(),
-      color: z.string(),
+      name: z.string().optional(),
+      order: z.number().optional(),
+      color: z.string().optional(),
     }),
     async resolve({ input, ctx }) {
       return await ctx.prisma.column.update({
