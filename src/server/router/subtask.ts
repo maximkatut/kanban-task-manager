@@ -16,7 +16,7 @@ export const subtaskRouter = createRouter()
   })
   .mutation("create", {
     input: z.object({
-      name: z.string(),
+      title: z.string(),
       taskId: z.string(),
       isCompleted: z.boolean(),
       order: z.number(),
@@ -24,7 +24,7 @@ export const subtaskRouter = createRouter()
     async resolve({ input, ctx }) {
       return await ctx.prisma.subtask.create({
         data: {
-          title: input.name,
+          title: input.title,
           taskId: input.taskId,
           isCompleted: input.isCompleted,
           order: input.order,
@@ -35,7 +35,7 @@ export const subtaskRouter = createRouter()
   .mutation("update", {
     input: z.object({
       id: z.string(),
-      name: z.string().optional(),
+      title: z.string().optional(),
       taskId: z.string().optional(),
       isCompleted: z.boolean().optional(),
       order: z.number().optional(),
@@ -46,7 +46,7 @@ export const subtaskRouter = createRouter()
           id: input.id,
         },
         data: {
-          title: input.name,
+          title: input.title,
           taskId: input.taskId,
           isCompleted: input.isCompleted,
           order: input.order,
