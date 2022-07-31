@@ -85,7 +85,7 @@ const BoardForm = ({ setIsModalOpen, isEditMode }: BoardFormProps) => {
                   placeholder="Column name..."
                   type="text"
                   id="column"
-                  className={`w-[85%] py-2 px-4 border-[1px] ${
+                  className={`w-[85%] py-2 px-4 pr-16 border-[1px] ${
                     errors?.[`columns`]?.[`${i}`]
                       ? "border-red animate-shake"
                       : "border-lines-light dark:border-lines-dark"

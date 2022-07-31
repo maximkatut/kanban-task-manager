@@ -89,7 +89,7 @@ const TaskForm = ({ task, isEditMode, setIsModalOpen }: TaskFormProps) => {
               placeholder="Subtask name..."
               type="text"
               id="subtask"
-              className={`relative hover:border-purple w-[93%] py-2 px-4 border-[1px] ${
+              className={`relative hover:border-purple w-[93%] py-2 px-4 pr-16 border-[1px] ${
                 errors?.[`subtasks`]?.[`${i}`] ? "border-red" : "border-lines-light dark:border-lines-dark"
               } rounded-sm mb-2 dark:bg-grey-very-dark`}
             />
