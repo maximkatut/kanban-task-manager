@@ -54,7 +54,7 @@ const useCreateBoard = ({ setIsModalOpen }: UseBoardProps) => {
 
   const { fields, append, remove } = useFieldArray({
     control,
-    name: "column" as never,
+    name: "columns" as never,
   });
 
   const onSubmit: SubmitHandler<Inputs> = async (data) => {
