@@ -47,13 +47,15 @@ const useCreateTask = ({ setIsModalOpen }: UseTaskProps) => {
   });
   const onSubmit: SubmitHandler<Inputs> = async (data) => {
     const column = columns?.find((c) => c.name.toLowerCase() === data.status.toLowerCase());
+    const tasks = utils.fetchQuery(["task.getByColumnId", { columnId: column?.id as string }]);
+
     await createTask(
       {
         title: data.title,
         description: data.description,
         columnId: column?.id as string,
         status: data.status,
-        order: 0,
+        order: (await tasks).length,
       },
       {
         async onSuccess({ id }) {
