@@ -26,12 +26,12 @@ const useEditBoard = ({ setIsModalOpen }: UseBoardProps) => {
   const [index, setIndex] = useState<number>(0);
   const utils = trpc.useContext();
   const { data: columns } = trpc.useQuery(["column.getByBoardId", { boardId: activeBoard?.id as string }]);
-  const { mutateAsync: createColumn } = trpc.useMutation("column.create", {
+  const { mutateAsync: createColumn, isLoading: isLoadingCreate } = trpc.useMutation("column.create", {
     async onSuccess() {
       activeBoard && (await utils.invalidateQueries(["column.getByBoardId", { boardId: activeBoard.id }]));
     },
   });
-  const { mutateAsync: updateColumn } = trpc.useMutation("column.update", {
+  const { mutateAsync: updateColumn, isLoading: isLoadingUpdate } = trpc.useMutation("column.update", {
     async onSuccess() {
       await utils.invalidateQueries(["column.getByBoardId", { boardId: activeBoard?.id as string }]);
     },
@@ -41,7 +41,7 @@ const useEditBoard = ({ setIsModalOpen }: UseBoardProps) => {
       await utils.invalidateQueries(["column.getByBoardId", { boardId: activeBoard?.id as string }]);
     },
   });
-  const { mutateAsync: updateBoard } = trpc.useMutation("board.update", {
+  const { mutateAsync: updateBoard, isLoading: isLoadingUpdateBoard } = trpc.useMutation("board.update", {
     async onSuccess(data) {
       await utils.invalidateQueries(["board.getAll"]);
       setActiveBoard(data);
@@ -61,7 +61,7 @@ const useEditBoard = ({ setIsModalOpen }: UseBoardProps) => {
     },
   });
 
-  const { fields, append, remove } = useFieldArray({
+  const { fields, append, remove, move } = useFieldArray({
     control,
     name: "columns" as never,
   });
@@ -114,6 +114,18 @@ const useEditBoard = ({ setIsModalOpen }: UseBoardProps) => {
     append({ name: "" });
   };
 
+  const handleMoveUpButton = (i: number) => {
+    if (i > 0) {
+      move(i, i - 1);
+    }
+  };
+
+  const handleMoveDownButton = (i: number, arr: []) => {
+    if (arr.length - 1 > i) {
+      move(i, i + 1);
+    }
+  };
+
   const handleDeleteColumnButton = () => {
     const i = index;
     columns && deleteColumn({ id: columns[i]?.id as string });
@@ -131,6 +143,9 @@ const useEditBoard = ({ setIsModalOpen }: UseBoardProps) => {
     isDeleteModalOpen,
     setIsDeleteModalOpen,
     handleDeleteColumnButton,
+    handleMoveUpButton,
+    handleMoveDownButton,
+    isLoading: isLoadingCreate || isLoadingUpdate || isLoadingUpdateBoard,
   };
 };
 export default useEditBoard;

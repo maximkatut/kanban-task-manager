@@ -1,9 +1,11 @@
+import { useAutoAnimate } from "@formkit/auto-animate/react";
 import { Task } from "@prisma/client";
 import useCreateTask from "../hooks/useCreateTask";
 import useEditTask from "../hooks/useEditTask";
 import { useStore } from "../store";
 import { trpc } from "../utils/trpc";
 import Button from "./button";
+import UpDownArrows from "./upDownArrows";
 
 interface TaskFormProps {
   task?: Task;
@@ -12,6 +14,7 @@ interface TaskFormProps {
 }
 
 const TaskForm = ({ task, isEditMode, setIsModalOpen }: TaskFormProps) => {
+  const [parent] = useAutoAnimate<HTMLFormElement>();
   const activeBoard = useStore((state) => state.activeBoard);
   const { data: columns } = trpc.useQuery(["column.getByBoardId", { boardId: activeBoard?.id as string }]);
   const {
@@ -33,6 +36,8 @@ const TaskForm = ({ task, isEditMode, setIsModalOpen }: TaskFormProps) => {
     handleNewSubtaskButtonEdit,
     handleRemoveCrossButtonEdit,
     isLoading,
+    handleMoveDownButton,
+    handleMoveUpButton,
   } = useEditTask({
     setIsModalOpen,
     task,
@@ -46,7 +51,7 @@ const TaskForm = ({ task, isEditMode, setIsModalOpen }: TaskFormProps) => {
   const handleRemoveCrossButton = isEditMode ? handleRemoveCrossButtonEdit : handleRemoveCrossButtonCreate;
 
   return (
-    <form onSubmit={onSubmit} className="dark:bg-grey-very-dark p-8 rounded-sm">
+    <form ref={parent} onSubmit={onSubmit} className="dark:bg-grey-very-dark p-8 rounded-sm">
       <h3 className="text-lg mb-5 font-bold">{isEditMode ? `Edit ${task?.title}` : "Add New Task"}</h3>
       <label htmlFor="title" className="text-grey-medium text-xs block mb-2">
         Title
@@ -70,12 +75,12 @@ const TaskForm = ({ task, isEditMode, setIsModalOpen }: TaskFormProps) => {
         className={`hover:border-purple w-full py-2 px-4 border-[1px] border-lines-light dark:border-lines-dark rounded-sm mb-5 dark:bg-grey-very-dark`}
       />
       <label className="text-grey-medium text-xs block mb-2">Subtasks</label>
-      {fields.map((f, i) => {
+      {fields.map((f, i, arr) => {
         return (
           <div
             className={`relative flex justify-between items-center ${
               errors?.[`subtasks`]?.[`${i}`] &&
-              "animate-shake before:content-['Can`t_be_empty'] before:text-red before:absolute before:top-2 before:right-10 before:z-10"
+              "animate-shake before:content-['Can`t_be_empty'] before:text-red before:absolute before:top-2 before:right-24 before:z-10"
             } `}
             key={f.id}
           >
@@ -88,10 +93,12 @@ const TaskForm = ({ task, isEditMode, setIsModalOpen }: TaskFormProps) => {
                 errors?.[`subtasks`]?.[`${i}`] ? "border-red" : "border-lines-light dark:border-lines-dark"
               } rounded-sm mb-2 dark:bg-grey-very-dark`}
             />
+            <UpDownArrows {...{ i, arr, handleMoveDownButton, handleMoveUpButton, isTask: true }} />
             <button
               aria-label="Remove column input"
               className="mb-1"
-              onClick={() => {
+              onClick={(e) => {
+                e.preventDefault();
                 handleRemoveCrossButton(i);
               }}
             >

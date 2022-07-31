@@ -56,7 +56,7 @@ const useEditTask = ({ setIsModalOpen, task }: UseTaskProps) => {
     },
   });
 
-  const { fields, append, remove } = useFieldArray({
+  const { fields, append, remove, move } = useFieldArray({
     control,
     name: "subtasks" as never,
   });
@@ -107,6 +107,18 @@ const useEditTask = ({ setIsModalOpen, task }: UseTaskProps) => {
     append({ title: "" });
   };
 
+  const handleMoveUpButton = (i: number) => {
+    if (i > 0) {
+      move(i, i - 1);
+    }
+  };
+
+  const handleMoveDownButton = (i: number, arr: []) => {
+    if (arr.length - 1 > i) {
+      move(i, i + 1);
+    }
+  };
+
   return {
     onEditSubmit: handleSubmit(onSubmit),
     fieldsEdit: fields,
@@ -115,6 +127,8 @@ const useEditTask = ({ setIsModalOpen, task }: UseTaskProps) => {
     errorsEdit: errors,
     registerEdit: register,
     isLoading: isLoadingSubtask || isLoadingSubtaskUpdate || isLoadingTask,
+    handleMoveUpButton,
+    handleMoveDownButton,
   };
 };
 

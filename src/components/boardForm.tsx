@@ -1,9 +1,11 @@
+import { useAutoAnimate } from "@formkit/auto-animate/react";
 import useCreateBoard from "../hooks/useCreateBoard";
 import useEditBoard from "../hooks/useEditBoard";
 import { useStore } from "../store/index";
 import Button from "./button";
 import DeleteModalInsert from "./deleteModalInsert";
 import Modal from "./modal";
+import UpDownArrows from "./upDownArrows";
 interface BoardFormProps {
   setIsModalOpen: (x: boolean) => void;
   isEditMode?: boolean;
@@ -11,6 +13,7 @@ interface BoardFormProps {
 
 const BoardForm = ({ setIsModalOpen, isEditMode }: BoardFormProps) => {
   const activeBoard = useStore((state) => state.activeBoard);
+  const [parent] = useAutoAnimate<HTMLFormElement>();
 
   const {
     onCreateSubmit,
@@ -33,6 +36,9 @@ const BoardForm = ({ setIsModalOpen, isEditMode }: BoardFormProps) => {
     isDeleteModalOpen,
     setIsDeleteModalOpen,
     handleDeleteColumnButton,
+    isLoading,
+    handleMoveDownButton,
+    handleMoveUpButton,
   } = useEditBoard({
     setIsModalOpen,
   });
@@ -55,7 +61,7 @@ const BoardForm = ({ setIsModalOpen, isEditMode }: BoardFormProps) => {
           />
         </Modal>
       )}
-      <form onSubmit={onSubmit} className="dark:bg-grey-very-dark p-8 rounded-sm">
+      <form ref={parent} onSubmit={onSubmit} className="dark:bg-grey-very-dark p-8 rounded-sm">
         <h3 className="text-lg mb-5 font-bold">{isEditMode ? `Edit ${activeBoard?.name}` : "Add New Board"}</h3>
         <label htmlFor="name" className="text-grey-medium text-xs block mb-2">
           {isEditMode ? activeBoard?.name : "Board Name"}
@@ -70,10 +76,10 @@ const BoardForm = ({ setIsModalOpen, isEditMode }: BoardFormProps) => {
           } hover:border-purple rounded-sm mb-5 dark:bg-grey-very-dark`}
         />
         <label className="text-grey-medium text-xs block mb-2">Board Columns</label>
-        {fields.map((f, i) => {
+        {fields.map((f, i, arr: any) => {
           return (
             <div key={f.id}>
-              <div className="flex justify-between items-center">
+              <div className="relative flex justify-between items-center">
                 <input
                   {...register(`columns.${i}.name` as const, { required: true })}
                   placeholder="Column name..."
@@ -85,6 +91,7 @@ const BoardForm = ({ setIsModalOpen, isEditMode }: BoardFormProps) => {
                       : "border-lines-light dark:border-lines-dark"
                   } hover:border-purple rounded-sm mb-2 dark:bg-grey-very-dark`}
                 />
+                <UpDownArrows {...{ arr, i, handleMoveDownButton, handleMoveUpButton }} />
                 <input
                   {...register(`columns.${i}.color` as const, { required: true })}
                   type="color"
@@ -121,7 +128,11 @@ const BoardForm = ({ setIsModalOpen, isEditMode }: BoardFormProps) => {
         </Button>
         <Button
           type="submit"
-          styles="mr-4 rounded-full px-6 py-3 font-bold text-white bg-purple hover:bg-purple-hover w-full"
+          isLoading={isLoading}
+          styles={`mr-4 rounded-full px-6 py-3 font-bold text-white w-full ${
+            isLoading ? "bg-purple-25" : "bg-purple hover:bg-purple-hover"
+          }
+        }`}
         >
           {isEditMode ? `Save changes` : "Create New Board"}
         </Button>
