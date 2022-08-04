@@ -16,10 +16,13 @@ const DeleteModalInsert = ({ setIsDeleteModalOpen, column, task, handleDeleteBut
   const client = trpc.useContext();
   const { data: boards } = trpc.useQuery(["board.getAll"]);
   const { mutate: deleteBoard } = trpc.useMutation("board.delete", {
-    async onSuccess() {
+    async onSuccess(data) {
       await client.invalidateQueries("board.getAll");
+      const restBoards = boards?.filter((b) => b.id !== data.id);
+      if (restBoards && restBoards?.length > 0) {
+        setActiveBoard(restBoards[0]);
+      }
       setIsDeleteModalOpen(false);
-      boards && setActiveBoard(boards[0]);
     },
   });
   const handleDeleteBoardClick = () => {
