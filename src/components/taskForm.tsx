@@ -8,7 +8,7 @@ import Button from "./button";
 import UpDownArrows from "./upDownArrows";
 
 interface TaskFormProps {
-  task?: Task;
+  task: Task;
   isEditMode?: boolean;
   setIsModalOpen: (x: boolean) => void;
 }
@@ -126,11 +126,13 @@ const TaskForm = ({ task, isEditMode, setIsModalOpen }: TaskFormProps) => {
         id="status"
         className={`hover:border-purple w-full py-3 px-4 border-[1px] bg-white uppercase border-lines-light dark:border-lines-dark rounded-sm mb-5 dark:bg-grey-very-dark`}
       >
-        {columns?.map((c) => (
-          <option key={c.id} value={c.name}>
-            {c.name.toUpperCase()}
-          </option>
-        ))}
+        {columns
+          ?.sort((a, b) => a.order - b.order)
+          .map((c) => (
+            <option key={c.id} value={c.name}>
+              {c.name.toUpperCase()}
+            </option>
+          ))}
       </select>
 
       <Button

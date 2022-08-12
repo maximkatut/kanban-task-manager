@@ -1,7 +1,28 @@
+import { Task } from "@prisma/client";
 import { z } from "zod";
 import { createRouter } from "./context";
 
 export const taskRouter = createRouter()
+  .query("getAll", {
+    input: z.object({
+      columnsDataIds: z.string().array(),
+    }),
+    async resolve({ ctx, input }) {
+      const getTasksByColumnId = async () => {
+        let allTasks = <Task[]>[];
+        for (let i = 0; i < input.columnsDataIds.length; i++) {
+          const tasks = await ctx.prisma.task.findMany({
+            where: {
+              columnId: input.columnsDataIds[i],
+            },
+          });
+          allTasks.push(...tasks);
+        }
+        return allTasks;
+      };
+      return getTasksByColumnId();
+    },
+  })
   .query("getByColumnId", {
     input: z.object({
       columnId: z.string(),
@@ -39,7 +60,7 @@ export const taskRouter = createRouter()
       id: z.string(),
       title: z.string().optional(),
       columnId: z.string().optional(),
-      description: z.string().optional(),
+      description: z.string().optional().nullish(),
       status: z.string().optional(),
       order: z.number().optional(),
     }),

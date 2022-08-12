@@ -21,7 +21,7 @@ const DotsMenu = ({ setIsDotsMenuOpen, handleEditClick, handleDeleteClick, posit
     return () => {
       document.removeEventListener("mousedown", handleOutsideClick);
     };
-  }, []);
+  });
 
   return (
     <div

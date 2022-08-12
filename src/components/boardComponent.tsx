@@ -1,9 +1,12 @@
-import { Board } from "@prisma/client";
-import { useState } from "react";
+import { Board, Task } from "@prisma/client";
+import { useCallback, useEffect, useState } from "react";
+import { DragDropContext, OnDragEndResponder } from "react-beautiful-dnd";
 import { SubmitHandler, useForm } from "react-hook-form";
+import { useColumnsStore } from "../store/columns";
+import { useTasksStore } from "../store/tasks";
 import { trpc } from "../utils/trpc";
 import Button from "./button";
-import Column from "./columnComponent";
+import ColumnComponent from "./columnComponent";
 import Loader from "./loader";
 import Modal from "./modal";
 interface BoardProps {
@@ -15,15 +18,18 @@ interface Inputs {
   color: string;
 }
 
-const Board = ({ board }: BoardProps) => {
+const BoardComponent = ({ board }: BoardProps) => {
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
+  const [isLoadingData, setIsLoadingData] = useState<boolean>(false);
+  const columns = useColumnsStore((state) => state.columns);
+  const setColumns = useColumnsStore((state) => state.setColumns);
+  const addColumn = useColumnsStore((state) => state.addColumn);
+  const tasks = useTasksStore((state) => state.tasks);
+  const setTasks = useTasksStore((state) => state.setTasks);
+  const setTask = useTasksStore((state) => state.setTask);
   const utils = trpc.useContext();
-  const { data: columns, isLoading } = trpc.useQuery(["column.getByBoardId", { boardId: board.id }]);
-  const { mutateAsync: createColumn, isLoading: createColumnIsLoading } = trpc.useMutation("column.create", {
-    async onSuccess() {
-      await utils.invalidateQueries(["column.getByBoardId", { boardId: board.id }]);
-    },
-  });
+  const { mutateAsync: createColumn, isLoading: createColumnIsLoading } = trpc.useMutation("column.create");
+  const { mutateAsync: updateTask } = trpc.useMutation("task.update");
   const {
     register,
     formState: { errors },
@@ -41,21 +47,64 @@ const Board = ({ board }: BoardProps) => {
     reset();
   };
 
+  const fetchData = useCallback(async () => {
+    setIsLoadingData(true);
+    const columnsData = await utils.fetchQuery(["column.getByBoardId", { boardId: board.id }]);
+    const columnsDataIds = columnsData.map((c) => c.id);
+    const tasks = await utils.fetchQuery(["task.getAll", { columnsDataIds }]);
+    setColumns(columnsData.sort((a, b) => a.order - b.order));
+    setTasks(tasks);
+    setIsLoadingData(false);
+  }, [board.id, setColumns, setTasks, utils]);
+
+  const updateTasks = useCallback(async () => {
+    for (let i = 0; i < tasks.length; i++) {
+      const task = tasks[i] as Task;
+      await updateTask(task);
+    }
+  }, [tasks, updateTask]);
+
+  useEffect(() => {
+    fetchData();
+  }, [setTasks, setColumns, fetchData]);
+
+  useEffect(() => {
+    updateTasks();
+  }, [tasks, updateTasks]);
+
   const onSubmit: SubmitHandler<Inputs> = async (data: Inputs) => {
     const columnNames = columns?.map((c) => c.name.toLowerCase()) as string[];
     if (columnNames.includes(data.columnName.toLowerCase())) {
       setError("columnName", { type: "custom", message: "This name already exists" }, { shouldFocus: true });
       return;
     } else {
-      await createColumn({
-        name: data.columnName,
-        boardId: board.id,
-        order: columns?.length as number,
-        color: data.color,
-      });
+      await createColumn(
+        {
+          name: data.columnName,
+          boardId: board.id,
+          order: columns?.length as number,
+          color: data.color,
+        },
+        {
+          onSuccess(data) {
+            addColumn(data);
+          },
+        }
+      );
       setIsModalOpen(false);
       reset();
     }
+  };
+
+  const onDragEnd: OnDragEndResponder = async (result) => {
+    const { destination, source, draggableId } = result;
+    if (!destination) {
+      return;
+    }
+    if (destination.droppableId === source.droppableId && destination.index === source.index) {
+      return;
+    }
+    setTask(draggableId, destination, source);
   };
 
   return (
@@ -83,25 +132,27 @@ const Board = ({ board }: BoardProps) => {
           </div>
         </form>
       </Modal>
-      {isLoading ? (
+      {isLoadingData ? (
         <Loader />
       ) : (
-        <ul className="min-h-[calc(100vh-80rem)] p-5 flex">
-          {columns
-            ?.sort((a, b) => a.order - b.order)
-            .map((c) => {
-              return <Column key={c.id} column={c} />;
-            })}
-          <li
-            onClick={handleNewColClick}
-            className="group w-[260px] h-[calc(100vh-200px)] mt-[43px] mb-[19px] rounded-lg bg-grey-create dark:bg-grey-create-dark hover:bg-purple-10 flex flex-col justify-center items-center cursor-pointer"
-          >
-            <p className="group-hover:text-purple font-bold text-lg cursor-pointer">+ New Column</p>
-          </li>
-        </ul>
+        <DragDropContext onDragEnd={onDragEnd}>
+          <ul className="min-h-[calc(100vh-80rem)] p-5 flex">
+            {columns
+              ?.sort((a, b) => a.order - b.order)
+              .map((c) => {
+                return <ColumnComponent key={c.id} column={c} tasks={tasks?.filter((t) => t.columnId === c.id)} />;
+              })}
+            <li
+              onClick={handleNewColClick}
+              className="group w-[260px] h-[calc(100vh-200px)] mt-[43px] mb-[19px] rounded-lg bg-grey-create dark:bg-grey-create-dark hover:bg-purple-10 flex flex-col justify-center items-center cursor-pointer"
+            >
+              <p className="group-hover:text-purple font-bold text-lg cursor-pointer">+ New Column</p>
+            </li>
+          </ul>
+        </DragDropContext>
       )}
     </>
   );
 };
 
-export default Board;
+export default BoardComponent;

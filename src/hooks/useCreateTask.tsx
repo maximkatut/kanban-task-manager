@@ -1,6 +1,7 @@
 import { Subtask } from "@prisma/client";
 import { SubmitHandler, useFieldArray, useForm } from "react-hook-form";
 import { useStore } from "../store";
+import { useTasksStore } from "../store/tasks";
 import { trpc } from "../utils/trpc";
 
 export interface Inputs {
@@ -16,11 +17,13 @@ export interface UseTaskProps {
 
 const useCreateTask = ({ setIsModalOpen }: UseTaskProps) => {
   const activeBoard = useStore((state) => state.activeBoard);
+  const addTask = useTasksStore((state) => state.addTask);
   const utils = trpc.useContext();
   const { data: columns } = trpc.useQuery(["column.getByBoardId", { boardId: activeBoard?.id as string }]);
   const { mutateAsync: createTask } = trpc.useMutation("task.create", {
     async onSuccess(data) {
       await utils.invalidateQueries(["task.getByColumnId", { columnId: data.columnId }]);
+      addTask(data);
     },
   });
   const { mutateAsync: createSubtask } = trpc.useMutation("subtask.create", {

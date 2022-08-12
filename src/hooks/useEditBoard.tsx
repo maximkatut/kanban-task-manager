@@ -1,7 +1,8 @@
-import { Board } from "@prisma/client";
+import { Board, Task } from "@prisma/client";
 import { useState } from "react";
 import { SubmitHandler, useFieldArray, useForm, UseFormSetError } from "react-hook-form";
 import { useStore } from "../store";
+import { useColumnsStore } from "../store/columns";
 import { findDuplicates } from "../utils/index";
 import { trpc } from "../utils/trpc";
 import { Inputs, UseBoardProps } from "./useCreateBoard";
@@ -22,18 +23,25 @@ export const checkOnDublicates = (data: Inputs, setError: UseFormSetError<Inputs
 const useEditBoard = ({ setIsModalOpen }: UseBoardProps) => {
   const activeBoard = useStore((state) => state.activeBoard) as Board;
   const setActiveBoard = useStore((state) => state.setActiveBoard);
+  const setColumns = useColumnsStore((state) => state.setColumns);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState<boolean>(false);
   const [index, setIndex] = useState<number>(0);
   const utils = trpc.useContext();
   const { data: columns } = trpc.useQuery(["column.getByBoardId", { boardId: activeBoard?.id as string }]);
+  const { mutateAsync: updateTask } = trpc.useMutation("task.update");
   const { mutateAsync: createColumn, isLoading: isLoadingCreate } = trpc.useMutation("column.create", {
     async onSuccess() {
       activeBoard && (await utils.invalidateQueries(["column.getByBoardId", { boardId: activeBoard.id }]));
     },
   });
   const { mutateAsync: updateColumn, isLoading: isLoadingUpdate } = trpc.useMutation("column.update", {
-    async onSuccess() {
+    async onSuccess(data) {
       await utils.invalidateQueries(["column.getByBoardId", { boardId: activeBoard?.id as string }]);
+      const tasks = await utils.fetchQuery(["task.getByColumnId", { columnId: data.id }]);
+      for (let i = 0; i < tasks.length; i++) {
+        const task = tasks[i] as Task;
+        await updateTask({ id: task.id, status: data.name });
+      }
     },
   });
   const { mutate: deleteColumn } = trpc.useMutation("column.delete", {
@@ -57,7 +65,7 @@ const useEditBoard = ({ setIsModalOpen }: UseBoardProps) => {
   } = useForm<Inputs>({
     defaultValues: {
       boardName: activeBoard?.name,
-      columns,
+      columns: columns?.sort((a, b) => a.order - b.order),
     },
   });
 
@@ -67,7 +75,6 @@ const useEditBoard = ({ setIsModalOpen }: UseBoardProps) => {
   });
 
   const onSubmit: SubmitHandler<Inputs> = async (data) => {
-    console.log(data);
     if (checkOnDublicates(data, setError)) {
       return;
     }
@@ -77,14 +84,12 @@ const useEditBoard = ({ setIsModalOpen }: UseBoardProps) => {
     }
 
     for (let index = 0; index < data.columns.length; index++) {
-      if (data.columns[index]?.id) {
-        await updateColumn({
-          id: data.columns[index]?.id as string,
-          name: data.columns[index]?.name,
-          order: index,
-          color: data.columns[index]?.color,
-        });
-      }
+      await updateColumn({
+        id: data.columns[index]?.id as string,
+        name: data.columns[index]?.name,
+        order: index,
+        color: data.columns[index]?.color,
+      });
     }
 
     if (columns && data.columns.length > columns?.length) {
@@ -97,7 +102,11 @@ const useEditBoard = ({ setIsModalOpen }: UseBoardProps) => {
         });
       }
     }
-
+    const newDataColumns = data.columns.map((c, i) => {
+      c.order = i;
+      return c;
+    });
+    setColumns(newDataColumns);
     setIsModalOpen(false);
   };
 

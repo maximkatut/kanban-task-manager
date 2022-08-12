@@ -1,6 +1,7 @@
-import { Board, Subtask, Task } from "@prisma/client";
+import { Board, Column, Subtask, Task } from "@prisma/client";
 import { SubmitHandler, useFieldArray, useForm } from "react-hook-form";
 import { useStore } from "../store";
+import { useTasksStore } from "../store/tasks";
 import { trpc } from "../utils/trpc";
 
 export interface Inputs {
@@ -12,20 +13,15 @@ export interface Inputs {
 
 export interface UseTaskProps {
   setIsModalOpen: (x: boolean) => void;
-  task?: Task;
+  task: Task;
 }
 
 const useEditTask = ({ setIsModalOpen, task }: UseTaskProps) => {
   const activeBoard = useStore((state) => state.activeBoard) as Board;
+  const updateTask = useTasksStore((state) => state.updateTask);
   const utils = trpc.useContext();
   const { data: columns } = trpc.useQuery(["column.getByBoardId", { boardId: activeBoard?.id as string }]);
-  const { data: subtasks } = trpc.useQuery(["subtask.getByTaskId", { taskId: task?.id as string }]);
-  const { mutateAsync: updateTask, isLoading: isLoadingTask } = trpc.useMutation("task.update", {
-    async onSuccess(data) {
-      await utils.invalidateQueries(["task.getByColumnId", { columnId: data.columnId }]);
-      task && (await utils.invalidateQueries(["task.getByColumnId", { columnId: task?.columnId }]));
-    },
-  });
+  const { data: subtasks } = trpc.useQuery(["subtask.getByTaskId", { taskId: task.id }]);
   const { mutateAsync: createSubtask, isLoading: isLoadingSubtask } = trpc.useMutation("subtask.create", {
     async onSuccess(data) {
       await utils.invalidateQueries(["subtask.getByTaskId", { taskId: data.taskId }]);
@@ -49,10 +45,10 @@ const useEditTask = ({ setIsModalOpen, task }: UseTaskProps) => {
     formState: { errors },
   } = useForm<Inputs>({
     defaultValues: {
-      title: task?.title,
-      description: task?.description as string,
+      title: task.title,
+      description: task.description as string,
       subtasks: subtasks,
-      status: task?.status,
+      status: task.status,
     },
   });
 
@@ -62,15 +58,16 @@ const useEditTask = ({ setIsModalOpen, task }: UseTaskProps) => {
   });
 
   const onSubmit: SubmitHandler<Inputs> = async (data) => {
-    const column = columns?.find((c) => c.name === data.status);
-
-    await updateTask({
-      id: task?.id as string,
+    const column = columns?.find((c) => c.name === data.status) as Column;
+    const newTask = {
+      id: task.id,
+      columnId: column.id,
+      status: data.status,
       title: data.title,
       description: data.description,
-      columnId: column?.id as string,
-      status: data.status,
-    });
+      order: task.order,
+    };
+    updateTask(newTask);
 
     for (let i = 0; i < data.subtasks.length; i++) {
       const subtask = data.subtasks[i];
@@ -126,7 +123,7 @@ const useEditTask = ({ setIsModalOpen, task }: UseTaskProps) => {
     handleNewSubtaskButtonEdit: handleNewSubtaskButton,
     errorsEdit: errors,
     registerEdit: register,
-    isLoading: isLoadingSubtask || isLoadingSubtaskUpdate || isLoadingTask,
+    isLoading: isLoadingSubtask || isLoadingSubtaskUpdate,
     handleMoveUpButton,
     handleMoveDownButton,
   };

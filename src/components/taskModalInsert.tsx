@@ -1,7 +1,8 @@
-import { Board, Column, Subtask, Task } from "@prisma/client";
+import { Column, Subtask, Task } from "@prisma/client";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
-import { useStore } from "../store/index";
+import { useColumnsStore } from "../store/columns";
+import { useTasksStore } from "../store/tasks";
 import { trpc } from "../utils/trpc";
 import Checkbox from "./checkbox";
 import DeleteModalInsert from "./deleteModalInsert";
@@ -24,18 +25,12 @@ const TaskModalInsert = ({ subtasks, task }: TaskModalInsertProps) => {
   const [isDotsMenuOpen, setIsDotsMenuOpen] = useState<Boolean>(false);
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState<boolean>(false);
-  const activeBoard = useStore((state) => state.activeBoard) as Board;
+  const columns = useColumnsStore((state) => state.columns);
+  const setTask = useTasksStore((state) => state.setTask);
   const utils = trpc.useContext();
-  const { data: columns } = trpc.useQuery(["column.getByBoardId", { boardId: activeBoard.id }]);
   const { mutate: deleteTask } = trpc.useMutation("task.delete", {
     onSuccess(data) {
       utils.invalidateQueries(["task.getByColumnId", { columnId: data.columnId }]);
-    },
-  });
-  const { mutateAsync: updateTask } = trpc.useMutation("task.update", {
-    async onSuccess(data) {
-      await utils.invalidateQueries(["task.getByColumnId", { columnId: data.columnId }]);
-      task && (await utils.invalidateQueries(["task.getByColumnId", { columnId: task?.columnId }]));
     },
   });
   const { mutateAsync: updateSubtask } = trpc.useMutation("subtask.update", {
@@ -69,13 +64,9 @@ const TaskModalInsert = ({ subtasks, task }: TaskModalInsertProps) => {
 
   const handleSelectChange = (e: any) => {
     const status = e.target.value;
-    const column = columns?.find((c) => c.name === status);
+    const column = columns?.find((c) => c.name === status) as Column;
     if (task.status !== status) {
-      updateTask({
-        id: task.id,
-        status: status,
-        columnId: column?.id,
-      });
+      setTask(task.id, { droppableId: column.id, index: 0 }, { droppableId: task.columnId, index: task.order });
     }
   };
 

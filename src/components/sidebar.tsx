@@ -27,7 +27,7 @@ const Sidebar = ({ setIsMenuOpen, isMenuOpen, boards }: SidebarProps) => {
         <BoardForm setIsModalOpen={setIsModalOpen} />
       </Modal>
       <aside
-        className={`transition-all pb-8 w-[calc(75rem/4)] h-[calc(100vh-98px)] bg-white dark:bg-grey-dark fixed bottom-0 ${
+        className={`z-10 transition-all pb-8 w-[calc(75rem/4)] h-[calc(100vh-98px)] bg-white dark:bg-grey-dark fixed bottom-0 ${
           isMenuOpen ? "left-0 overflow-auto" : "-left-80"
         } flex flex-col justify-between`}
       >
