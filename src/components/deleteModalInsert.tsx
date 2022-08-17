@@ -1,5 +1,5 @@
 import { Board } from "@prisma/client";
-import { useStore } from "../store/index";
+import { useStore } from "../store/boards";
 import { trpc } from "../utils/trpc";
 import Button from "./button";
 

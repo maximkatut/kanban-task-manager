@@ -5,11 +5,12 @@ import TaskComponent from "./task";
 interface ColumnProps {
   column: Column;
   tasks: Task[] | undefined;
+  isShowStyles: boolean;
 }
 
-const Column = ({ column, tasks }: ColumnProps) => {
+const Column = ({ column, tasks, isShowStyles }: ColumnProps) => {
   return (
-    <li className="w-[305px]">
+    <li className={`w-[295px] mx-[5px]`}>
       <h3 className="uppercase flex items-center mb-5">
         <span
           style={{ backgroundColor: column?.color || COLORS[0] }}
@@ -21,7 +22,11 @@ const Column = ({ column, tasks }: ColumnProps) => {
       </h3>
       <Droppable droppableId={column.id}>
         {(provided) => (
-          <ul ref={provided.innerRef} {...provided.droppableProps}>
+          <ul
+            ref={provided.innerRef}
+            {...provided.droppableProps}
+            className={`py-2 ${isShowStyles ? "bg-purple-10 rounded-md" : ""}`}
+          >
             {tasks
               ?.sort((a, b) => a.order - b.order)
               .map((t, i) => {

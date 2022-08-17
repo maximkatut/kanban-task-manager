@@ -22,6 +22,7 @@ interface Inputs {
 const BoardComponent = ({ board }: BoardProps) => {
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
   const [isLoadingData, setIsLoadingData] = useState<boolean>(false);
+  const [isShowStyles, setIsShowStyles] = useState<boolean>(false);
   const columns = useColumnsStore((state) => state.columns);
   const setColumns = useColumnsStore((state) => state.setColumns);
   const addColumn = useColumnsStore((state) => state.addColumn);
@@ -97,8 +98,12 @@ const BoardComponent = ({ board }: BoardProps) => {
     }
   };
 
+  const onDragStart = () => {
+    setIsShowStyles(true);
+  };
   const onDragEnd: OnDragEndResponder = async (result) => {
     const { destination, source, draggableId } = result;
+    setIsShowStyles(false);
     if (!destination) {
       return;
     }
@@ -137,12 +142,19 @@ const BoardComponent = ({ board }: BoardProps) => {
       {isLoadingData ? (
         <Loader />
       ) : (
-        <DragDropContext onDragEnd={onDragEnd}>
+        <DragDropContext onDragEnd={onDragEnd} onDragStart={onDragStart}>
           <ul className="min-h-[calc(100vh-80rem)] p-5 flex">
             {columns
               ?.sort((a, b) => a.order - b.order)
               .map((c) => {
-                return <ColumnComponent key={c.id} column={c} tasks={tasks?.filter((t) => t.columnId === c.id)} />;
+                return (
+                  <ColumnComponent
+                    isShowStyles={isShowStyles}
+                    key={c.id}
+                    column={c}
+                    tasks={tasks?.filter((t) => t.columnId === c.id)}
+                  />
+                );
               })}
             <li
               onClick={handleNewColClick}

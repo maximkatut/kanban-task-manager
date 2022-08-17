@@ -1,6 +1,6 @@
 import { Board } from "@prisma/client";
 import { useState } from "react";
-import { useStore } from "../store";
+import { useStore } from "../store/boards";
 import AsideButton from "./asideButtton";
 import BoardForm from "./boardForm";
 import Modal from "./modal";

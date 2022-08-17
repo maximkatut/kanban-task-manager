@@ -31,7 +31,7 @@ const Task = ({ task, index }: TaskProps) => {
             {...provided.draggableProps}
             ref={provided.innerRef}
             onClick={handleTaskClick}
-            className="relative group mb-5 px-4 py-5 w-[calc(100%-1.25rem)] bg-white dark:bg-grey-dark 
+            className="relative group mx-[10px] my-3 px-4 py-5 w-[calc(100%-1.25rem)] bg-white dark:bg-grey-dark 
             rounded-lg shadow-sm cursor-pointer font-bold hover:text-purple hover:shadow hover:translate-y-[-1px]"
           >
             <h4 className="text-base text-ellipsis overflow-hidden">{task.title}</h4>

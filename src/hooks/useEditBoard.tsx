@@ -1,7 +1,7 @@
 import { Board, Task } from "@prisma/client";
 import { useState } from "react";
 import { SubmitHandler, useFieldArray, useForm, UseFormSetError } from "react-hook-form";
-import { useStore } from "../store";
+import { useStore } from "../store/boards";
 import { useColumnsStore } from "../store/columns";
 import { findDuplicates } from "../utils/index";
 import { trpc } from "../utils/trpc";
@@ -27,7 +27,7 @@ const useEditBoard = ({ setIsModalOpen }: UseBoardProps) => {
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState<boolean>(false);
   const [index, setIndex] = useState<number>(0);
   const utils = trpc.useContext();
-  const { data: columns } = trpc.useQuery(["column.getByBoardId", { boardId: activeBoard?.id as string }]);
+  const columns = useColumnsStore((state) => state.columns);
   const { mutateAsync: updateTask } = trpc.useMutation("task.update");
   const { mutateAsync: createColumn, isLoading: isLoadingCreate } = trpc.useMutation("column.create", {
     async onSuccess() {

@@ -6,7 +6,7 @@ import Header from "../components/header";
 import Layout from "../components/layout";
 import Loader from "../components/loader";
 import Sidebar from "../components/sidebar";
-import { useStore } from "../store";
+import { useStore } from "../store/boards";
 import { trpc } from "../utils/trpc";
 
 const Home: NextPage = () => {

@@ -1,7 +1,7 @@
 import { useAutoAnimate } from "@formkit/auto-animate/react";
 import useCreateBoard from "../hooks/useCreateBoard";
 import useEditBoard from "../hooks/useEditBoard";
-import { useStore } from "../store/index";
+import { useStore } from "../store/boards";
 import Button from "./button";
 import DeleteModalInsert from "./deleteModalInsert";
 import Modal from "./modal";

@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
+import { useStore } from "../store/boards";
 import { useColumnsStore } from "../store/columns";
-import { useStore } from "../store/index";
 import BoardForm from "./boardForm";
 import Button from "./button";
 import CreateTaskForm from "./createTaskForm";
