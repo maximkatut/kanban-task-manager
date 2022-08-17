@@ -14,8 +14,8 @@ export const removeTask = (tasks: Task[], indexFrom: number) => {
   return tasks;
 };
 
-export const addTask = (tasks: Task[], task: Task, indexTo: number) => {
-  tasks.splice(indexTo, 0, task);
+export const addTask = (tasks: Task[], task: Task | undefined, indexTo: number) => {
+  task && tasks.splice(indexTo, 0, task);
   tasks.forEach((t, i) => (t.order = i));
   return tasks;
 };
