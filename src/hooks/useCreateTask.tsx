@@ -44,7 +44,7 @@ const useCreateTask = ({ setIsModalOpen }: UseTaskProps) => {
     },
   });
 
-  const { fields, append, remove } = useFieldArray({
+  const { fields, append, remove, move } = useFieldArray({
     control,
     name: "subtasks" as never,
   });
@@ -85,13 +85,27 @@ const useCreateTask = ({ setIsModalOpen }: UseTaskProps) => {
     append({ name: "" });
   };
 
+  const handleMoveUpButton = (i: number) => {
+    if (i > 0) {
+      move(i, i - 1);
+    }
+  };
+
+  const handleMoveDownButton = (i: number, arr: []) => {
+    if (arr.length - 1 > i) {
+      move(i, i + 1);
+    }
+  };
+
   return {
-    onCreateSubmit: handleSubmit(onSubmit),
-    fieldsCreate: fields,
-    handleRemoveCrossButtonCreate: handleRemoveCrossButton,
-    handleNewSubtaskButtonCreate: handleNewSubtaskButton,
-    errorsCreate: errors,
-    registerCreate: register,
+    onSubmit: handleSubmit(onSubmit),
+    fields,
+    handleRemoveCrossButton,
+    handleNewSubtaskButton,
+    errors,
+    register,
+    handleMoveUpButton,
+    handleMoveDownButton,
   };
 };
 

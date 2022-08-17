@@ -1,54 +1,41 @@
 import { useAutoAnimate } from "@formkit/auto-animate/react";
-import { Task } from "@prisma/client";
-import useCreateTask from "../hooks/useCreateTask";
-import useEditTask from "../hooks/useEditTask";
-import { useStore } from "../store";
-import { trpc } from "../utils/trpc";
+import { Column, Task } from "@prisma/client";
+import { DeepRequired, FieldErrorsImpl, UseFormRegister } from "react-hook-form";
+import { Inputs as InputsCreate } from "../hooks/useCreateTask";
+import { Inputs } from "../hooks/useEditTask";
 import Button from "./button";
 import UpDownArrows from "./upDownArrows";
 
 interface TaskFormProps {
   task: Task;
   isEditMode?: boolean;
-  setIsModalOpen: (x: boolean) => void;
+  columns: Column[];
+  onSubmit: () => void;
+  register: UseFormRegister<InputsCreate | Inputs>;
+  errors: FieldErrorsImpl<DeepRequired<InputsCreate | Inputs>>;
+  fields: Record<"id", string>[];
+  handleMoveDownButton: (i: number, arr: any) => void;
+  handleMoveUpButton: (i: number) => void;
+  handleRemoveCrossButton: (i: number) => void;
+  handleNewSubtaskButton: () => void;
+  isLoading?: boolean;
 }
 
-const TaskForm = ({ task, isEditMode, setIsModalOpen }: TaskFormProps) => {
+const TaskForm = ({
+  task,
+  isEditMode,
+  columns,
+  onSubmit,
+  register,
+  errors,
+  fields,
+  handleMoveDownButton,
+  handleMoveUpButton,
+  handleRemoveCrossButton,
+  handleNewSubtaskButton,
+  isLoading,
+}: TaskFormProps) => {
   const [parent] = useAutoAnimate<HTMLFormElement>();
-  const activeBoard = useStore((state) => state.activeBoard);
-  const { data: columns } = trpc.useQuery(["column.getByBoardId", { boardId: activeBoard?.id as string }]);
-  const {
-    onCreateSubmit,
-    registerCreate,
-    errorsCreate,
-    fieldsCreate,
-    handleNewSubtaskButtonCreate,
-    handleRemoveCrossButtonCreate,
-  } = useCreateTask({
-    setIsModalOpen,
-  });
-
-  const {
-    onEditSubmit,
-    registerEdit,
-    errorsEdit,
-    fieldsEdit,
-    handleNewSubtaskButtonEdit,
-    handleRemoveCrossButtonEdit,
-    isLoading,
-    handleMoveDownButton,
-    handleMoveUpButton,
-  } = useEditTask({
-    setIsModalOpen,
-    task,
-  });
-
-  const onSubmit = isEditMode ? onEditSubmit : onCreateSubmit;
-  const register = isEditMode ? registerEdit : registerCreate;
-  const errors = isEditMode ? errorsEdit : errorsCreate;
-  const fields = isEditMode ? fieldsEdit : fieldsCreate;
-  const handleNewSubtaskButton = isEditMode ? handleNewSubtaskButtonEdit : handleNewSubtaskButtonCreate;
-  const handleRemoveCrossButton = isEditMode ? handleRemoveCrossButtonEdit : handleRemoveCrossButtonCreate;
 
   return (
     <form ref={parent} onSubmit={onSubmit} className="dark:bg-grey-very-dark p-8 rounded-sm">
@@ -99,7 +86,7 @@ const TaskForm = ({ task, isEditMode, setIsModalOpen }: TaskFormProps) => {
               className="mb-1"
               onClick={(e) => {
                 e.preventDefault();
-                handleRemoveCrossButton(i);
+                handleRemoveCrossButton && handleRemoveCrossButton(i);
               }}
             >
               <svg width="15" height="15" xmlns="http://www.w3.org/2000/svg">

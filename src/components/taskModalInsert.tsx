@@ -8,8 +8,8 @@ import Checkbox from "./checkbox";
 import DeleteModalInsert from "./deleteModalInsert";
 import DotsButton from "./dotsButton";
 import DotsMenu from "./dotsMenu";
+import EditTaskForm from "./editTaskForm";
 import Modal from "./modal";
-import TaskForm from "./taskForm";
 
 interface TaskModalInsertProps {
   task: Task;
@@ -26,7 +26,7 @@ const TaskModalInsert = ({ subtasks, task }: TaskModalInsertProps) => {
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState<boolean>(false);
   const columns = useColumnsStore((state) => state.columns);
-  const setTask = useTasksStore((state) => state.setTask);
+  const updateTaskStatus = useTasksStore((state) => state.updateTaskStatus);
   const utils = trpc.useContext();
   const { mutate: deleteTask } = trpc.useMutation("task.delete", {
     onSuccess(data) {
@@ -66,7 +66,7 @@ const TaskModalInsert = ({ subtasks, task }: TaskModalInsertProps) => {
     const status = e.target.value;
     const column = columns?.find((c) => c.name === status) as Column;
     if (task.status !== status) {
-      setTask(task.id, { droppableId: column.id, index: 0 }, { droppableId: task.columnId, index: task.order });
+      updateTaskStatus(column.id, task.id, status);
     }
   };
 
@@ -83,7 +83,7 @@ const TaskModalInsert = ({ subtasks, task }: TaskModalInsertProps) => {
         <DeleteModalInsert task {...{ setIsDeleteModalOpen }} handleDeleteButton={handleDeleteTaskButton} />
       </Modal>
       <Modal {...{ setIsModalOpen, isModalOpen }}>
-        <TaskForm task={task} isEditMode setIsModalOpen={setIsModalOpen} />
+        <EditTaskForm task={task} setIsModalOpen={setIsModalOpen} isEditMode />
       </Modal>
       <div className="dark:bg-grey-very-dark p-8 rounded-sm">
         <div className="relative flex items-center mb-6 justify-between">

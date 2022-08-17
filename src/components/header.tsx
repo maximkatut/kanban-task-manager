@@ -3,12 +3,12 @@ import { useColumnsStore } from "../store/columns";
 import { useStore } from "../store/index";
 import BoardForm from "./boardForm";
 import Button from "./button";
+import CreateTaskForm from "./createTaskForm";
 import DeleteModalInsert from "./deleteModalInsert";
 import DotsButton from "./dotsButton";
 import DotsMenu from "./dotsMenu";
 import Modal from "./modal";
 import Logo from "./svg/logo";
-import TaskForm from "./taskForm";
 interface HeaderProps {
   isMenuOpen?: boolean;
 }
@@ -52,7 +52,7 @@ const Header = ({ isMenuOpen }: HeaderProps) => {
         <DeleteModalInsert {...{ setIsDeleteModalOpen }} />
       </Modal>
       <Modal isModalOpen={isTaskModalOpen} setIsModalOpen={setIsTaskModalOpen}>
-        <TaskForm setIsModalOpen={setIsTaskModalOpen} />
+        <CreateTaskForm setIsModalOpen={setIsTaskModalOpen} />
       </Modal>
       <header className="z-10 flex items-center bg-white dark:bg-grey-dark fixed w-full top-0 left-0">
         <div

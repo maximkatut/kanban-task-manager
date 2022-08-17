@@ -4,6 +4,7 @@ import { DragDropContext, OnDragEndResponder } from "react-beautiful-dnd";
 import { SubmitHandler, useForm } from "react-hook-form";
 import { useColumnsStore } from "../store/columns";
 import { useTasksStore } from "../store/tasks";
+import { COLORS } from "../utils/const";
 import { trpc } from "../utils/trpc";
 import Button from "./button";
 import ColumnComponent from "./columnComponent";
@@ -36,7 +37,7 @@ const BoardComponent = ({ board }: BoardProps) => {
     setError,
     handleSubmit,
     reset,
-  } = useForm<Inputs>({ defaultValues: { columnName: "", color: "#49C4E5" } });
+  } = useForm<Inputs>({ defaultValues: { columnName: "", color: COLORS[0] } });
 
   const handleNewColClick = () => {
     setIsModalOpen(true);
@@ -104,7 +105,8 @@ const BoardComponent = ({ board }: BoardProps) => {
     if (destination.droppableId === source.droppableId && destination.index === source.index) {
       return;
     }
-    setTask(draggableId, destination, source);
+    const column = columns?.find((c) => c.id === destination.droppableId);
+    setTask(draggableId, destination, source, column?.name);
   };
 
   return (
