@@ -3,8 +3,8 @@ import { useState } from "react";
 import { useStore } from "../store/boards";
 import AsideButton from "./asideButtton";
 import BoardForm from "./boardForm";
+import DarkModeToggle from "./darkModeToggle";
 import Modal from "./modal";
-import Toggle from "./toggle";
 
 interface SidebarProps {
   setIsMenuOpen: (x: boolean) => void;
@@ -55,8 +55,8 @@ const Sidebar = ({ setIsMenuOpen, isMenuOpen, boards }: SidebarProps) => {
             </li>
           </ul>
         </div>
-        <div>
-          <Toggle />
+        <div className="text-center">
+          <DarkModeToggle />
 
           <AsideButton
             onClick={() => {
