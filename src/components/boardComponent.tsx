@@ -143,7 +143,7 @@ const BoardComponent = ({ board }: BoardProps) => {
         <Loader />
       ) : (
         <DragDropContext onDragEnd={onDragEnd} onDragStart={onDragStart}>
-          <ul className="min-h-[calc(100vh-80rem)] p-5 flex">
+          <ul className="min-h-[calc(100vh-80rem)] p-5 flex h-full">
             {columns
               ?.sort((a, b) => a.order - b.order)
               .map((c) => {
@@ -156,12 +156,24 @@ const BoardComponent = ({ board }: BoardProps) => {
                   />
                 );
               })}
-            <li
-              onClick={handleNewColClick}
-              className="group w-[260px] h-[calc(100vh-200px)] mt-[43px] mb-[19px] rounded-lg bg-grey-create dark:bg-grey-create-dark hover:bg-purple-10 flex flex-col justify-center items-center cursor-pointer"
-            >
-              <p className="group-hover:text-purple font-bold text-lg cursor-pointer">+ New Column</p>
-            </li>
+            {columns?.length === 0 ? (
+              <div className="mx-auto text-base flex flex-col my-auto">
+                <p className="text-grey-medium mb-5">This board is empty. Create a new column to get started.</p>
+                <Button
+                  styles="mx-auto rounded-full px-6 py-3 text-white bg-purple hover:bg-purple-hover w-60"
+                  onClick={handleNewColClick}
+                >
+                  + Add New Column
+                </Button>
+              </div>
+            ) : (
+              <li
+                onClick={handleNewColClick}
+                className="group w-[260px] h-[calc(100vh-200px)] mt-[43px] mb-[19px] rounded-lg bg-grey-create dark:bg-grey-create-dark hover:bg-purple-10 flex flex-col justify-center items-center cursor-pointer"
+              >
+                <p className="group-hover:text-purple font-bold text-lg cursor-pointer">+ New Column</p>
+              </li>
+            )}
           </ul>
         </DragDropContext>
       )}
