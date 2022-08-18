@@ -1,9 +1,11 @@
+import { useAutoAnimate } from "@formkit/auto-animate/react";
 import useCreateBoard from "../hooks/useCreateBoard";
 import useEditBoard from "../hooks/useEditBoard";
-import { useStore } from "../store/index";
+import { useStore } from "../store/boards";
 import Button from "./button";
 import DeleteModalInsert from "./deleteModalInsert";
 import Modal from "./modal";
+import UpDownArrows from "./upDownArrows";
 interface BoardFormProps {
   setIsModalOpen: (x: boolean) => void;
   isEditMode?: boolean;
@@ -11,6 +13,7 @@ interface BoardFormProps {
 
 const BoardForm = ({ setIsModalOpen, isEditMode }: BoardFormProps) => {
   const activeBoard = useStore((state) => state.activeBoard);
+  const [parent] = useAutoAnimate<HTMLFormElement>();
 
   const {
     onCreateSubmit,
@@ -33,6 +36,9 @@ const BoardForm = ({ setIsModalOpen, isEditMode }: BoardFormProps) => {
     isDeleteModalOpen,
     setIsDeleteModalOpen,
     handleDeleteColumnButton,
+    isLoading,
+    handleMoveDownButton,
+    handleMoveUpButton,
   } = useEditBoard({
     setIsModalOpen,
   });
@@ -51,11 +57,11 @@ const BoardForm = ({ setIsModalOpen, isEditMode }: BoardFormProps) => {
           <DeleteModalInsert
             column
             setIsDeleteModalOpen={setIsDeleteModalOpen}
-            handleDeleteColumnButton={handleDeleteColumnButton}
+            handleDeleteButton={handleDeleteColumnButton}
           />
         </Modal>
       )}
-      <form onSubmit={onSubmit} className="dark:bg-grey-very-dark p-8 rounded-sm">
+      <form ref={parent} onSubmit={onSubmit} className="dark:bg-grey-very-dark p-8 rounded-sm">
         <h3 className="text-lg mb-5 font-bold">{isEditMode ? `Edit ${activeBoard?.name}` : "Add New Board"}</h3>
         <label htmlFor="name" className="text-grey-medium text-xs block mb-2">
           {isEditMode ? activeBoard?.name : "Board Name"}
@@ -67,26 +73,27 @@ const BoardForm = ({ setIsModalOpen, isEditMode }: BoardFormProps) => {
           id="name"
           className={`w-full py-2 px-4 border-[1px] ${
             errors.boardName ? "border-red animate-shake" : "border-lines-light dark:border-lines-dark"
-          } rounded-sm mb-5 dark:bg-grey-very-dark`}
+          } hover:border-purple rounded-sm mb-5 dark:bg-grey-very-dark`}
         />
         <label className="text-grey-medium text-xs block mb-2">Board Columns</label>
-        {fields.map((f, i) => {
+        {fields.map((f, i, arr: any) => {
           return (
             <div key={f.id}>
-              <div className="flex justify-between items-center">
+              <div className="relative flex justify-between items-center">
                 <input
-                  {...register(`column.${i}.name` as const, { required: true })}
+                  {...register(`columns.${i}.name` as const, { required: true })}
                   placeholder="Column name..."
                   type="text"
                   id="column"
-                  className={`w-[85%] py-2 px-4 border-[1px] ${
-                    errors?.[`column`]?.[`${i}`]
+                  className={`w-[85%] py-2 px-4 pr-16 border-[1px] ${
+                    errors?.[`columns`]?.[`${i}`]
                       ? "border-red animate-shake"
                       : "border-lines-light dark:border-lines-dark"
-                  } rounded-sm mb-2 dark:bg-grey-very-dark`}
+                  } hover:border-purple rounded-sm mb-2 dark:bg-grey-very-dark`}
                 />
+                <UpDownArrows {...{ arr, i, handleMoveDownButton, handleMoveUpButton }} />
                 <input
-                  {...register(`column.${i}.color` as const, { required: true })}
+                  {...register(`columns.${i}.color` as const, { required: true })}
                   type="color"
                   defaultValue={"#FF9898"}
                   className={`w-6 h-6 mb-2`}
@@ -100,15 +107,15 @@ const BoardForm = ({ setIsModalOpen, isEditMode }: BoardFormProps) => {
                   }}
                 >
                   <svg width="15" height="15" xmlns="http://www.w3.org/2000/svg">
-                    <g fill="#828FA3" fillRule="evenodd">
+                    <g className="hover:fill-red" fill="#828FA3" fillRule="evenodd">
                       <path d="m12.728 0 2.122 2.122L2.122 14.85 0 12.728z" />
                       <path d="M0 2.122 2.122 0 14.85 12.728l-2.122 2.122z" />
                     </g>
                   </svg>
                 </button>
               </div>
-              {errors.column?.[`${i}`]?.name?.type === "custom" && (
-                <p className="text-red-hover">{errors.column?.[`${i}`]?.name?.message}</p>
+              {errors.columns?.[`${i}`]?.name?.type === "custom" && (
+                <p className="text-red-hover">{errors.columns?.[`${i}`]?.name?.message}</p>
               )}
             </div>
           );
@@ -121,7 +128,11 @@ const BoardForm = ({ setIsModalOpen, isEditMode }: BoardFormProps) => {
         </Button>
         <Button
           type="submit"
-          styles="mr-4 rounded-full px-6 py-3 font-bold text-white bg-purple hover:bg-purple-hover w-full"
+          isLoading={isLoading}
+          styles={`mr-4 rounded-full px-6 py-3 font-bold text-white w-full ${
+            isLoading ? "bg-purple-25" : "bg-purple hover:bg-purple-hover"
+          }
+        }`}
         >
           {isEditMode ? `Save changes` : "Create New Board"}
         </Button>

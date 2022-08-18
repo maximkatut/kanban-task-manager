@@ -1,10 +1,10 @@
 import { Board } from "@prisma/client";
 import { useState } from "react";
-import { useStore } from "../store";
+import { useStore } from "../store/boards";
 import AsideButton from "./asideButtton";
 import BoardForm from "./boardForm";
+import DarkModeToggle from "./darkModeToggle";
 import Modal from "./modal";
-import Toggle from "./toggle";
 
 interface SidebarProps {
   setIsMenuOpen: (x: boolean) => void;
@@ -27,8 +27,8 @@ const Sidebar = ({ setIsMenuOpen, isMenuOpen, boards }: SidebarProps) => {
         <BoardForm setIsModalOpen={setIsModalOpen} />
       </Modal>
       <aside
-        className={`transition-all pb-8 w-[calc(75rem/4)] h-[calc(100vh-98px)] bg-white dark:bg-grey-dark fixed bottom-0 ${
-          isMenuOpen ? "left-0 overflow-scroll" : "-left-80"
+        className={`z-10 transition-all pb-8 w-[calc(75rem/4)] h-[calc(100vh-98px)] bg-white dark:bg-grey-dark fixed bottom-0 ${
+          isMenuOpen ? "left-0 overflow-auto" : "-left-80"
         } flex flex-col justify-between`}
       >
         <div>
@@ -55,8 +55,8 @@ const Sidebar = ({ setIsMenuOpen, isMenuOpen, boards }: SidebarProps) => {
             </li>
           </ul>
         </div>
-        <div>
-          <Toggle />
+        <div className="text-center">
+          <DarkModeToggle />
 
           <AsideButton
             onClick={() => {

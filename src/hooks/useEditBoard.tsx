@@ -1,24 +1,18 @@
-import { Board } from "@prisma/client";
+import { Board, Task } from "@prisma/client";
 import { useState } from "react";
 import { SubmitHandler, useFieldArray, useForm, UseFormSetError } from "react-hook-form";
-import { useStore } from "../store";
+import { useStore } from "../store/boards";
+import { useColumnsStore } from "../store/columns";
 import { findDuplicates } from "../utils/index";
 import { trpc } from "../utils/trpc";
 import { Inputs, UseBoardProps } from "./useCreateBoard";
 
-interface columnData {
-  order: number;
-  id: string;
-  name: string;
-  color: string;
-}
-
 export const checkOnDublicates = (data: Inputs, setError: UseFormSetError<Inputs>) => {
-  const columnNames = data.column.map((c) => c.name);
+  const columnNames = data.columns.map((c) => c.name);
   const dublicates = findDuplicates(columnNames);
   const inputIndex = columnNames.findIndex((it) => it === dublicates[0]);
   if (dublicates.length > 0) {
-    setError(`column.${inputIndex}.name`, {
+    setError(`columns.${inputIndex}.name`, {
       type: "custom",
       message: "Two or more columns can't be with the same name",
     });
@@ -29,18 +23,25 @@ export const checkOnDublicates = (data: Inputs, setError: UseFormSetError<Inputs
 const useEditBoard = ({ setIsModalOpen }: UseBoardProps) => {
   const activeBoard = useStore((state) => state.activeBoard) as Board;
   const setActiveBoard = useStore((state) => state.setActiveBoard);
+  const setColumns = useColumnsStore((state) => state.setColumns);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState<boolean>(false);
   const [index, setIndex] = useState<number>(0);
   const utils = trpc.useContext();
-  const { data: columns } = trpc.useQuery(["column.getByBoardId", { boardId: activeBoard?.id as string }]);
-  const { mutateAsync: createColumn } = trpc.useMutation("column.create", {
+  const columns = useColumnsStore((state) => state.columns);
+  const { mutateAsync: updateTask } = trpc.useMutation("task.update");
+  const { mutateAsync: createColumn, isLoading: isLoadingCreate } = trpc.useMutation("column.create", {
     async onSuccess() {
       activeBoard && (await utils.invalidateQueries(["column.getByBoardId", { boardId: activeBoard.id }]));
     },
   });
-  const { mutateAsync: updateColumn } = trpc.useMutation("column.update", {
-    async onSuccess() {
+  const { mutateAsync: updateColumn, isLoading: isLoadingUpdate } = trpc.useMutation("column.update", {
+    async onSuccess(data) {
       await utils.invalidateQueries(["column.getByBoardId", { boardId: activeBoard?.id as string }]);
+      const tasks = await utils.fetchQuery(["task.getByColumnId", { columnId: data.id }]);
+      for (let i = 0; i < tasks.length; i++) {
+        const task = tasks[i] as Task;
+        await updateTask({ id: task.id, status: data.name });
+      }
     },
   });
   const { mutate: deleteColumn } = trpc.useMutation("column.delete", {
@@ -48,14 +49,12 @@ const useEditBoard = ({ setIsModalOpen }: UseBoardProps) => {
       await utils.invalidateQueries(["column.getByBoardId", { boardId: activeBoard?.id as string }]);
     },
   });
-  const { mutateAsync: updateBoard } = trpc.useMutation("board.update", {
+  const { mutateAsync: updateBoard, isLoading: isLoadingUpdateBoard } = trpc.useMutation("board.update", {
     async onSuccess(data) {
       await utils.invalidateQueries(["board.getAll"]);
       setActiveBoard(data);
     },
   });
-
-  const columnsNameArr = columns?.sort((a, b) => a.order - b.order).map((c) => ({ name: c.name, color: c.color }));
 
   const {
     register,
@@ -66,17 +65,16 @@ const useEditBoard = ({ setIsModalOpen }: UseBoardProps) => {
   } = useForm<Inputs>({
     defaultValues: {
       boardName: activeBoard?.name,
-      column: columnsNameArr,
+      columns: columns?.sort((a, b) => a.order - b.order),
     },
   });
 
-  const { fields, append, remove } = useFieldArray({
+  const { fields, append, remove, move } = useFieldArray({
     control,
-    name: "column" as never,
+    name: "columns" as never,
   });
 
   const onSubmit: SubmitHandler<Inputs> = async (data) => {
-    let columnsNewArray: columnData[] = [];
     if (checkOnDublicates(data, setError)) {
       return;
     }
@@ -85,38 +83,30 @@ const useEditBoard = ({ setIsModalOpen }: UseBoardProps) => {
       await updateBoard({ boardName: data.boardName, boardId: activeBoard?.id });
     }
 
-    data.column.forEach((newColumn, newIndex) => {
-      columns?.forEach((oldColumn, oldIndex) => {
-        if (newIndex === oldIndex) {
-          if (newColumn.name === oldColumn.name && newColumn.color === oldColumn.color) {
-            return;
-          }
-          columnsNewArray.push({
-            name: newColumn.name,
-            order: newIndex,
-            id: columns[oldIndex]?.id as string,
-            color: newColumn.color,
-          });
-        }
+    for (let index = 0; index < data.columns.length; index++) {
+      await updateColumn({
+        id: data.columns[index]?.id as string,
+        name: data.columns[index]?.name,
+        order: index,
+        color: data.columns[index]?.color,
       });
-    });
-
-    for (let column of columnsNewArray) {
-      await updateColumn(column);
     }
 
-    if (columns && data.column.length > columns?.length) {
-      const delta = data.column.length - columns?.length;
-      for (let index = data.column.length - 1; index >= data.column.length - delta; index--) {
+    if (columns && data.columns.length > columns?.length) {
+      for (let index = data.columns.length - 1; index >= columns?.length; index--) {
         await createColumn({
-          name: data.column[index]?.name as string,
+          name: data.columns[index]?.name as string,
           boardId: activeBoard.id,
           order: index,
-          color: data.column[index]?.color as string,
+          color: data.columns[index]?.color as string,
         });
       }
     }
-
+    const newDataColumns = data.columns.map((c, i) => {
+      c.order = i;
+      return c;
+    });
+    setColumns(newDataColumns);
     setIsModalOpen(false);
   };
 
@@ -131,6 +121,18 @@ const useEditBoard = ({ setIsModalOpen }: UseBoardProps) => {
 
   const handleNewColumnButton = () => {
     append({ name: "" });
+  };
+
+  const handleMoveUpButton = (i: number) => {
+    if (i > 0) {
+      move(i, i - 1);
+    }
+  };
+
+  const handleMoveDownButton = (i: number, arr: []) => {
+    if (arr.length - 1 > i) {
+      move(i, i + 1);
+    }
   };
 
   const handleDeleteColumnButton = () => {
@@ -150,6 +152,9 @@ const useEditBoard = ({ setIsModalOpen }: UseBoardProps) => {
     isDeleteModalOpen,
     setIsDeleteModalOpen,
     handleDeleteColumnButton,
+    handleMoveUpButton,
+    handleMoveDownButton,
+    isLoading: isLoadingCreate || isLoadingUpdate || isLoadingUpdateBoard,
   };
 };
 export default useEditBoard;

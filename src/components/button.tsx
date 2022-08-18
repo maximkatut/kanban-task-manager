@@ -13,7 +13,10 @@ const Button = ({ children, styles, type, onClick, isLoading }: ButtonProps) => 
       disabled={isLoading}
       onClick={onClick}
       type={type}
-      className={styles || "mr-4 rounded-full px-6 py-3 text-white bg-purple hover:bg-purple-hover w-44"}
+      className={
+        styles ||
+        `mr-4 rounded-full px-6 py-3 text-white bg-purple hover:bg-purple-hover w-44 ${isLoading && "bg-purple-hover"}`
+      }
     >
       {children}
     </button>
