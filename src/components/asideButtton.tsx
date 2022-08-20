@@ -21,7 +21,7 @@ const AsideButton = ({
     <button
       onClick={onClick}
       disabled={active}
-      className={`transition-all ${!isMenuOpen ? "ml-80 bg-purple p-4" : "w-[275px] px-8 py-3"} group ${
+      className={`transition-all ${!isMenuOpen ? "ml-80 bg-purple p-4" : "w-[240px] lg:w-[275px] px-8 py-3"} group ${
         isTextHidden && !isMenuOpen && "absolute bottom-6"
       } rounded-r-full font-bold ${
         active
@@ -29,7 +29,7 @@ const AsideButton = ({
           : isMenuOpen
           ? "text-grey-medium hover:text-purple hover:bg-purple-10"
           : "hover:bg-purple-hover"
-      } text-base flex items-center`}
+      } text-sm lg:text-base flex items-center`}
     >
       <span>
         <BoardNameImage {...{ active, newBoard, isTextHidden, isMenuOpen }} />

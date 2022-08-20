@@ -10,7 +10,7 @@ interface ColumnProps {
 
 const Column = ({ column, tasks, isShowStyles }: ColumnProps) => {
   return (
-    <li className={`w-[295px] mx-[5px]`}>
+    <li className={`w-64 lg:w-[295px] mx-[2px]`}>
       <h3 className="uppercase flex items-center">
         <span
           style={{ backgroundColor: column?.color || COLORS[0] }}

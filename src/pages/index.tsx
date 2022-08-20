@@ -32,11 +32,11 @@ const Home: NextPage = () => {
         <link rel="manifest" href="/site.webmanifest" />
       </Head>
       <Header isMenuOpen={isMenuOpen} />
-      <div className="inline-flex mt-[98px]">
+      <div className="inline-flex mt-[82px] lg:mt-[98px]">
         {boards && <Sidebar {...{ setIsMenuOpen, isMenuOpen, boards }} />}
         <main
           className={`${
-            isMenuOpen ? "ml-[calc(75rem/4)]" : ""
+            isMenuOpen && "ml-[calc(65rem/4)] lg:ml-[calc(75rem/4)]"
           } transition-all bg-grey-light dark:bg-grey-very-dark min-h-[calc(100vh-98px)] min-w-[calc(100vw-75rem/4)]`}
         >
           <h1 className="visually-hidden">Kanban - Task Manager</h1>

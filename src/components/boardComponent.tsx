@@ -169,7 +169,7 @@ const BoardComponent = ({ board }: BoardProps) => {
             ) : (
               <li
                 onClick={handleNewColClick}
-                className="group w-[260px] h-[calc(100vh-200px)] mt-[43px] mb-[19px] rounded-lg bg-grey-create dark:bg-grey-create-dark hover:bg-purple-10 flex flex-col justify-center items-center cursor-pointer"
+                className="group w-[200px] lg:w-[260px] h-[calc(100vh-200px)] mt-[43px] mb-[19px] rounded-lg bg-grey-create dark:bg-grey-create-dark hover:bg-purple-10 flex flex-col justify-center items-center cursor-pointer"
               >
                 <p className="group-hover:text-purple font-bold text-lg cursor-pointer">+ New Column</p>
               </li>

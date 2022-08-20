@@ -27,9 +27,11 @@ const Sidebar = ({ setIsMenuOpen, isMenuOpen, boards }: SidebarProps) => {
         <BoardForm setIsModalOpen={setIsModalOpen} />
       </Modal>
       <aside
-        className={`z-10 transition-all pb-8 w-[calc(75rem/4)] h-[calc(100vh-98px)] bg-white dark:bg-grey-dark fixed bottom-0 ${
-          isMenuOpen ? "left-0 overflow-auto" : "-left-80"
-        } flex flex-col justify-between`}
+        className={`z-10 transition-all pb-8 w-[calc(65rem/4)] 
+        lg:w-[calc(75rem/4)] h-[calc(100vh-82px)] lg:h-[calc(100vh-98px)]
+         bg-white dark:bg-grey-dark fixed top-[82px] lg:top-[98px] ${
+           isMenuOpen ? "left-0 overflow-auto" : "-left-80"
+         } flex flex-col justify-between`}
       >
         <div>
           <p className="px-7 py-3 tracking-[0.15rem] uppercase">All boards ({boards.length})</p>

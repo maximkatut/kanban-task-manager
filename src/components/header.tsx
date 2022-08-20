@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { useStore } from "../store/boards";
 import { useColumnsStore } from "../store/columns";
+import { truncate } from "../utils";
 import BoardForm from "./boardForm";
 import Button from "./button";
 import CreateTaskForm from "./createTaskForm";
@@ -56,14 +57,14 @@ const Header = ({ isMenuOpen }: HeaderProps) => {
       </Modal>
       <header className="z-10 flex items-center bg-white dark:bg-grey-dark fixed w-full top-0 left-0">
         <div
-          className={`transition-all py-9 ${
-            isMenuOpen ? "pl-7 pr-[119px]" : "px-7"
+          className={`transition-all py-7 lg:py-9 ${
+            isMenuOpen ? "pl-7 pr-[80px] lg:pr-[119px]" : "px-7"
           } border-r-[1px] border-lines-light dark:border-x-lines-dark`}
         >
           <Logo />
         </div>
         <div className="flex items-center justify-between flex-grow pl-10 pr-6">
-          <h2 className="text-2xl font-bold">{activeBoard?.name}</h2>
+          <h2 className="text-2xl font-bold">{activeBoard && truncate(activeBoard.name)}</h2>
           <div className="relative flex justify-between text-base">
             <Button
               isLoading={isDisabledButton}
