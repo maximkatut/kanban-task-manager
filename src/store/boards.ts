@@ -6,7 +6,7 @@ interface BoardState {
   setActiveBoard: (board: Board | undefined) => void;
 }
 
-export const useStore = create<BoardState>((set) => ({
+export const useBoardStore = create<BoardState>((set) => ({
   activeBoard: null,
   setActiveBoard: (board) => set((state) => ({ activeBoard: board })),
 }));

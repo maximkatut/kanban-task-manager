@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
-import { useStore } from "../store/boards";
+import { useStore } from "../store";
+import { useBoardStore } from "../store/boards";
 import { useColumnsStore } from "../store/columns";
 import { truncate } from "../utils";
 import BoardForm from "./boardForm";
@@ -15,8 +16,9 @@ interface HeaderProps {
 }
 
 const Header = ({ isMenuOpen }: HeaderProps) => {
-  const activeBoard = useStore((state) => state.activeBoard);
+  const activeBoard = useBoardStore((state) => state.activeBoard);
   const columns = useColumnsStore((state) => state.columns);
+  const width = useStore((state) => state.width);
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState<boolean>(false);
   const [isTaskModalOpen, setIsTaskModalOpen] = useState<boolean>(false);
@@ -57,22 +59,27 @@ const Header = ({ isMenuOpen }: HeaderProps) => {
       </Modal>
       <header className="z-10 flex items-center bg-white dark:bg-grey-dark fixed w-full top-0 left-0">
         <div
-          className={`transition-all py-7 lg:py-9 ${
-            isMenuOpen ? "pl-7 pr-[80px] lg:pr-[119px]" : "px-7"
-          } border-r-[1px] border-lines-light dark:border-x-lines-dark`}
+          className={`transition-all py-5 md:py-7 lg:py-9 ${
+            isMenuOpen ? "pl-7 pr-[80px] lg:pr-[119px]" : "px-4 md:px-7"
+          } md:border-r-[1px] border-lines-light dark:border-x-lines-dark`}
         >
           <Logo />
         </div>
-        <div className="flex items-center justify-between flex-grow pl-10 pr-6">
+        <div className="flex items-center justify-between flex-grow px-3 md:pl-10 md:pr-6">
           <h2 className="text-2xl font-bold">{activeBoard && truncate(activeBoard.name)}</h2>
           <div className="relative flex justify-between text-base">
             <Button
+              styles={
+                width > 767
+                  ? undefined
+                  : "mr-4 rounded-full text-white bg-purple py-1 hover:bg-purple-hover w-20 text-2xl font-bold"
+              }
               isLoading={isDisabledButton}
               onClick={() => {
                 setIsTaskModalOpen(true);
               }}
             >
-              + Add New Task
+              +
             </Button>
             <DotsButton onClick={clickDotsButtonHandler} />
             {isDotsMenuOpen && (

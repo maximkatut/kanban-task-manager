@@ -1,6 +1,6 @@
 import { Subtask } from "@prisma/client";
 import { SubmitHandler, useFieldArray, useForm } from "react-hook-form";
-import { useStore } from "../store/boards";
+import { useBoardStore } from "../store/boards";
 import { useTasksStore } from "../store/tasks";
 import { trpc } from "../utils/trpc";
 
@@ -16,7 +16,7 @@ export interface UseTaskProps {
 }
 
 const useCreateTask = ({ setIsModalOpen }: UseTaskProps) => {
-  const activeBoard = useStore((state) => state.activeBoard);
+  const activeBoard = useBoardStore((state) => state.activeBoard);
   const addTask = useTasksStore((state) => state.addTask);
   const utils = trpc.useContext();
   const { data: columns } = trpc.useQuery(["column.getByBoardId", { boardId: activeBoard?.id as string }]);

@@ -1,6 +1,6 @@
 import { Column } from "@prisma/client";
 import { SubmitHandler, useFieldArray, useForm } from "react-hook-form";
-import { useStore } from "../store/boards";
+import { useBoardStore } from "../store/boards";
 import { useColumnsStore } from "../store/columns";
 import { COLORS } from "../utils/const";
 import { trpc } from "../utils/trpc";
@@ -16,7 +16,7 @@ export interface UseBoardProps {
 }
 
 const useCreateBoard = ({ setIsModalOpen }: UseBoardProps) => {
-  const setActiveBoard = useStore((state) => state.setActiveBoard);
+  const setActiveBoard = useBoardStore((state) => state.setActiveBoard);
   const addColumn = useColumnsStore((state) => state.addColumn);
   const utils = trpc.useContext();
   const { mutateAsync: createColumn } = trpc.useMutation("column.create");

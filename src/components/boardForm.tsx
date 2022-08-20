@@ -1,7 +1,7 @@
 import { useAutoAnimate } from "@formkit/auto-animate/react";
 import useCreateBoard from "../hooks/useCreateBoard";
 import useEditBoard from "../hooks/useEditBoard";
-import { useStore } from "../store/boards";
+import { useBoardStore } from "../store/boards";
 import Button from "./button";
 import DeleteModalInsert from "./deleteModalInsert";
 import Modal from "./modal";
@@ -12,7 +12,7 @@ interface BoardFormProps {
 }
 
 const BoardForm = ({ setIsModalOpen, isEditMode }: BoardFormProps) => {
-  const activeBoard = useStore((state) => state.activeBoard);
+  const activeBoard = useBoardStore((state) => state.activeBoard);
   const [parent] = useAutoAnimate<HTMLFormElement>();
 
   const {

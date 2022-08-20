@@ -2,6 +2,7 @@ import { Board, Task } from "@prisma/client";
 import { useCallback, useEffect, useState } from "react";
 import { DragDropContext, OnDragEndResponder } from "react-beautiful-dnd";
 import { SubmitHandler, useForm } from "react-hook-form";
+import { useStore } from "../store";
 import { useColumnsStore } from "../store/columns";
 import { useTasksStore } from "../store/tasks";
 import { COLORS } from "../utils/const";
@@ -23,6 +24,7 @@ const BoardComponent = ({ board }: BoardProps) => {
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
   const [isLoadingData, setIsLoadingData] = useState<boolean>(false);
   const [isShowStyles, setIsShowStyles] = useState<boolean>(false);
+  const setWidth = useStore((state) => state.setWidth);
   const columns = useColumnsStore((state) => state.columns);
   const setColumns = useColumnsStore((state) => state.setColumns);
   const addColumn = useColumnsStore((state) => state.addColumn);
@@ -73,6 +75,12 @@ const BoardComponent = ({ board }: BoardProps) => {
   useEffect(() => {
     updateTasks();
   }, [tasks, updateTasks]);
+
+  useEffect(() => {
+    window.addEventListener("resize", () => {
+      setWidth(window.innerWidth);
+    });
+  });
 
   const onSubmit: SubmitHandler<Inputs> = async (data: Inputs) => {
     const columnNames = columns?.map((c) => c.name.toLowerCase()) as string[];

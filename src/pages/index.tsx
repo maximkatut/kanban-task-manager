@@ -6,14 +6,14 @@ import Header from "../components/header";
 import Layout from "../components/layout";
 import Loader from "../components/loader";
 import Sidebar from "../components/sidebar";
-import { useStore } from "../store/boards";
+import { useBoardStore } from "../store/boards";
 import { trpc } from "../utils/trpc";
 
 const Home: NextPage = () => {
   const [isMenuOpen, setIsMenuOpen] = useState<boolean>(true);
   const { data: boards, isLoading } = trpc.useQuery(["board.getAll"]);
-  const activeBoard = useStore((state) => state.activeBoard);
-  const setActiveBoard = useStore((state) => state.setActiveBoard);
+  const activeBoard = useBoardStore((state) => state.activeBoard);
+  const setActiveBoard = useBoardStore((state) => state.setActiveBoard);
 
   useEffect(() => {
     if (!activeBoard && boards) {

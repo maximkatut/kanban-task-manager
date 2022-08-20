@@ -1,5 +1,5 @@
 import { Board } from "@prisma/client";
-import { useStore } from "../store/boards";
+import { useBoardStore } from "../store/boards";
 import { trpc } from "../utils/trpc";
 import Button from "./button";
 
@@ -11,8 +11,8 @@ interface DeleteModalInsertProps {
 }
 
 const DeleteModalInsert = ({ setIsDeleteModalOpen, column, task, handleDeleteButton }: DeleteModalInsertProps) => {
-  const activeBoard = useStore((state) => state.activeBoard) as Board;
-  const setActiveBoard = useStore((state) => state.setActiveBoard);
+  const activeBoard = useBoardStore((state) => state.activeBoard) as Board;
+  const setActiveBoard = useBoardStore((state) => state.setActiveBoard);
   const client = trpc.useContext();
   const { data: boards } = trpc.useQuery(["board.getAll"]);
   const { mutate: deleteBoard } = trpc.useMutation("board.delete", {

@@ -1,7 +1,7 @@
 import { Board, Task } from "@prisma/client";
 import { useState } from "react";
 import { SubmitHandler, useFieldArray, useForm, UseFormSetError } from "react-hook-form";
-import { useStore } from "../store/boards";
+import { useBoardStore } from "../store/boards";
 import { useColumnsStore } from "../store/columns";
 import { findDuplicates } from "../utils/index";
 import { trpc } from "../utils/trpc";
@@ -21,8 +21,8 @@ export const checkOnDublicates = (data: Inputs, setError: UseFormSetError<Inputs
 };
 
 const useEditBoard = ({ setIsModalOpen }: UseBoardProps) => {
-  const activeBoard = useStore((state) => state.activeBoard) as Board;
-  const setActiveBoard = useStore((state) => state.setActiveBoard);
+  const activeBoard = useBoardStore((state) => state.activeBoard) as Board;
+  const setActiveBoard = useBoardStore((state) => state.setActiveBoard);
   const setColumns = useColumnsStore((state) => state.setColumns);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState<boolean>(false);
   const [index, setIndex] = useState<number>(0);

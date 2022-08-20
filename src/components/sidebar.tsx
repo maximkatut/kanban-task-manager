@@ -1,6 +1,6 @@
 import { Board } from "@prisma/client";
 import { useState } from "react";
-import { useStore } from "../store/boards";
+import { useBoardStore } from "../store/boards";
 import AsideButton from "./asideButtton";
 import BoardForm from "./boardForm";
 import DarkModeToggle from "./darkModeToggle";
@@ -14,8 +14,8 @@ interface SidebarProps {
 
 const Sidebar = ({ setIsMenuOpen, isMenuOpen, boards }: SidebarProps) => {
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
-  const setActiveBoard = useStore((state) => state.setActiveBoard);
-  const activeBoard = useStore((state) => state.activeBoard);
+  const setActiveBoard = useBoardStore((state) => state.setActiveBoard);
+  const activeBoard = useBoardStore((state) => state.activeBoard);
 
   const createButtonHandler = () => {
     setIsModalOpen(true);

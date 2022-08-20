@@ -1,6 +1,6 @@
 import { Board, Subtask, Task } from "@prisma/client";
 import { SubmitHandler, useFieldArray, useForm } from "react-hook-form";
-import { useStore } from "../store/boards";
+import { useBoardStore } from "../store/boards";
 import { useTasksStore } from "../store/tasks";
 import { trpc } from "../utils/trpc";
 
@@ -17,7 +17,7 @@ export interface UseTaskProps {
 }
 
 const useEditTask = ({ setIsModalOpen, task }: UseTaskProps) => {
-  const activeBoard = useStore((state) => state.activeBoard) as Board;
+  const activeBoard = useBoardStore((state) => state.activeBoard) as Board;
   const tasks = useTasksStore((state) => state.tasks);
   const updateTask = useTasksStore((state) => state.updateTask);
   const updateTaskStatus = useTasksStore((state) => state.updateTaskStatus);
