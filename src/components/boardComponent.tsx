@@ -77,9 +77,13 @@ const BoardComponent = ({ board }: BoardProps) => {
   }, [tasks, updateTasks]);
 
   useEffect(() => {
-    window.addEventListener("resize", () => {
+    const handleResize = () => {
       setWidth(window.innerWidth);
-    });
+    };
+    window.addEventListener("resize", handleResize);
+    return () => {
+      window.removeEventListener("resize", handleResize);
+    };
   });
 
   const onSubmit: SubmitHandler<Inputs> = async (data: Inputs) => {
@@ -166,7 +170,9 @@ const BoardComponent = ({ board }: BoardProps) => {
               })}
             {columns?.length === 0 ? (
               <div className="mx-auto text-base flex flex-col my-auto">
-                <p className="text-grey-medium mb-5">This board is empty. Create a new column to get started.</p>
+                <p className="text-grey-medium mb-5 text-center">
+                  This board is empty. Create a new column to get started.
+                </p>
                 <Button
                   styles="mx-auto rounded-full px-6 py-3 text-white bg-purple hover:bg-purple-hover w-60"
                   onClick={handleNewColClick}
