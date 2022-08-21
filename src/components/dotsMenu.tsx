@@ -11,6 +11,7 @@ interface DotsMenuProps {
 const DotsMenu = ({ setIsDotsMenuOpen, handleEditClick, handleDeleteClick, position, task }: DotsMenuProps) => {
   const ref = useRef<HTMLDivElement | null>(null);
   const name = task ? "Task" : "Board";
+
   useEffect(() => {
     const handleOutsideClick = (e: any) => {
       if (ref.current && !ref.current.contains(e.target)) {

@@ -1,5 +1,7 @@
 import { Dispatch, SetStateAction, useEffect } from "react";
 import ReactModal from "react-modal";
+import { useStore } from "../store";
+import { MD_WIDTH } from "../utils/const";
 
 interface ModalProps {
   children?: React.ReactNode;
@@ -8,9 +10,11 @@ interface ModalProps {
 }
 
 const Modal = ({ children, isModalOpen, setIsModalOpen }: ModalProps) => {
+  const width = useStore((state) => state.width);
   useEffect(() => {
     ReactModal.setAppElement(document.getElementById("layout") as HTMLElement);
   }, []);
+
   return (
     <ReactModal
       style={{
@@ -20,7 +24,7 @@ const Modal = ({ children, isModalOpen, setIsModalOpen }: ModalProps) => {
           left: "0",
           right: "0",
           margin: "auto",
-          width: "480px",
+          width: width > MD_WIDTH ? "480px" : "343px",
           maxHeight: "90vh",
           height: "min-content",
           padding: "0",

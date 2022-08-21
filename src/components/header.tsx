@@ -3,6 +3,7 @@ import { useStore } from "../store";
 import { useBoardStore } from "../store/boards";
 import { useColumnsStore } from "../store/columns";
 import { truncate } from "../utils";
+import { MD_WIDTH } from "../utils/const";
 import BoardForm from "./boardForm";
 import Button from "./button";
 import CreateTaskForm from "./createTaskForm";
@@ -13,9 +14,10 @@ import Modal from "./modal";
 import Logo from "./svg/logo";
 interface HeaderProps {
   isMenuOpen?: boolean;
+  setIsMenuOpen: (x: boolean) => void;
 }
 
-const Header = ({ isMenuOpen }: HeaderProps) => {
+const Header = ({ isMenuOpen, setIsMenuOpen }: HeaderProps) => {
   const activeBoard = useBoardStore((state) => state.activeBoard);
   const columns = useColumnsStore((state) => state.columns);
   const width = useStore((state) => state.width);
@@ -24,6 +26,9 @@ const Header = ({ isMenuOpen }: HeaderProps) => {
   const [isTaskModalOpen, setIsTaskModalOpen] = useState<boolean>(false);
   const [isDotsMenuOpen, setIsDotsMenuOpen] = useState<boolean>(false);
   const [isDisabledButton, setIsDisabledButton] = useState<boolean>(false);
+
+  const isMediaMd = width > MD_WIDTH;
+
   const clickDotsButtonHandler = () => {
     setIsDotsMenuOpen((prevState) => !prevState);
   };
@@ -46,6 +51,13 @@ const Header = ({ isMenuOpen }: HeaderProps) => {
     setIsDotsMenuOpen(false);
   };
 
+  const handleSidebarOpenClick = () => {
+    if (isMediaMd) {
+      return;
+    }
+    setIsMenuOpen(!isMenuOpen);
+  };
+
   return (
     <>
       <Modal {...{ isModalOpen, setIsModalOpen }}>
@@ -57,20 +69,35 @@ const Header = ({ isMenuOpen }: HeaderProps) => {
       <Modal isModalOpen={isTaskModalOpen} setIsModalOpen={setIsTaskModalOpen}>
         <CreateTaskForm setIsModalOpen={setIsTaskModalOpen} />
       </Modal>
-      <header className="z-10 flex items-center bg-white dark:bg-grey-dark fixed w-full top-0 left-0">
+      <header className="z-10 max-h-24 flex items-center bg-white dark:bg-grey-dark fixed w-full top-0 left-0">
         <div
           className={`transition-all py-5 md:py-7 lg:py-9 ${
-            isMenuOpen ? "pl-7 pr-[80px] lg:pr-[119px]" : "px-4 md:px-7"
+            isMenuOpen && isMediaMd ? "pl-7 pr-[80px] lg:pr-[119px]" : "px-4 md:px-7"
           } md:border-r-[1px] border-lines-light dark:border-x-lines-dark`}
         >
           <Logo />
         </div>
         <div className="flex items-center justify-between flex-grow px-3 md:pl-10 md:pr-6">
-          <h2 className="text-2xl font-bold">{activeBoard && truncate(activeBoard.name)}</h2>
+          <h2
+            className={` font-bold ${isMediaMd ? "text-2xl" : "cursor-pointer flex items-center text-lg"}`}
+            onClick={handleSidebarOpenClick}
+          >
+            {activeBoard && truncate(activeBoard.name)}
+            {!isMediaMd && (
+              <svg
+                className={`mr-2 ${isMenuOpen ? "ml-2" : "rotate-180 mb-2"}`}
+                width="20"
+                height="14"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <path stroke="#635FC7" strokeWidth="3" fill="none" d="M9 6 5 2 1 6" />
+              </svg>
+            )}
+          </h2>
           <div className="relative flex justify-between text-base">
             <Button
               styles={
-                width > 767
+                isMediaMd
                   ? undefined
                   : "mr-4 rounded-full text-white bg-purple py-1 hover:bg-purple-hover w-20 text-2xl font-bold"
               }
@@ -79,12 +106,12 @@ const Header = ({ isMenuOpen }: HeaderProps) => {
                 setIsTaskModalOpen(true);
               }}
             >
-              +
+              {isMediaMd ? "+ Add New Task" : "+"}
             </Button>
             <DotsButton onClick={clickDotsButtonHandler} />
             {isDotsMenuOpen && (
               <DotsMenu
-                position={"top-20 left-0"}
+                position={isMediaMd ? "top-20 left-0" : "top-16 right-0"}
                 setIsDotsMenuOpen={setIsDotsMenuOpen}
                 handleDeleteClick={handleDeleteClick}
                 handleEditClick={handleEditClick}

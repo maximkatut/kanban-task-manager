@@ -9,6 +9,7 @@ body {
   font-weight: 500;
   font-size: 13px;
   line-height: 23px;
+  background-color: rgb(244 247 253);
 }
 
 .visually-hidden {

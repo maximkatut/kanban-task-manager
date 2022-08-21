@@ -53,7 +53,7 @@ const DarkModeToggle = ({ children }: DarkModeToggleProps) => {
 
   return (
     <>
-      <div className="mb-1 mx-5 py-3 px-16 lg:px-[4.5rem] rounded-md bg-grey-light dark:bg-grey-very-dark flex justify-between">
+      <div className="mt-5 mb-1 mx-5 py-3 px-16 lg:px-[4.5rem] rounded-md bg-grey-light dark:bg-grey-very-dark flex justify-between">
         <span>
           <svg width="19" height="19" xmlns="http://www.w3.org/2000/svg">
             <path
