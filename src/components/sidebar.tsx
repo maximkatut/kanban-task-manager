@@ -1,5 +1,6 @@
 import { Board } from "@prisma/client";
-import { useState } from "react";
+import { useRef, useState } from "react";
+import useOutsideClick from "../hooks/useOutsideClick";
 import { useStore } from "../store";
 import { useBoardStore } from "../store/boards";
 import { MD_WIDTH } from "../utils/const";
@@ -15,10 +16,12 @@ interface SidebarProps {
 }
 
 const Sidebar = ({ setIsMenuOpen, isMenuOpen, boards }: SidebarProps) => {
+  const ref = useRef<HTMLElement | null>(null);
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
   const setActiveBoard = useBoardStore((state) => state.setActiveBoard);
   const activeBoard = useBoardStore((state) => state.activeBoard);
   const width = useStore((state) => state.width);
+  const {} = useOutsideClick({ setIsMenuOpen, ref });
 
   const checkIsMediaMdAndCloseMenu = () => {
     if (!isMediaMd) {
@@ -44,6 +47,7 @@ const Sidebar = ({ setIsMenuOpen, isMenuOpen, boards }: SidebarProps) => {
         <BoardForm setIsModalOpen={setIsModalOpen} />
       </Modal>
       <aside
+        ref={ref}
         className={`z-10 flex flex-col transition-all md:pb-8 w-[calc(65rem/4)] 
         lg:w-[calc(75rem/4)] md:h-[calc(100vh-82px)] lg:h-[calc(100vh-98px)]
          bg-white dark:bg-grey-dark fixed top-[66px] md:top-[82px] lg:top-[98px] ${
