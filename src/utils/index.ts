@@ -1,6 +1,6 @@
 import { Task } from "@prisma/client";
 
-const COUNT_OF_LETTERS = 25;
+const RATIO = 30;
 
 export const findDuplicates = (arr: string[]) => arr.filter((item, index) => arr.indexOf(item) !== index);
 
@@ -23,9 +23,10 @@ export const addTask = (tasks: Task[], task: Task | undefined, indexTo: number) 
   return tasks;
 };
 
-export const truncate = (input: string) => {
-  if (input.length > COUNT_OF_LETTERS) {
-    return input.substring(0, COUNT_OF_LETTERS) + "...";
+export const truncate = (input: string, width: number) => {
+  const value = width / RATIO;
+  if (input.length > value) {
+    return input.substring(0, value) + "...";
   }
   return input;
 };

@@ -14,6 +14,7 @@ const useOutsideClick = ({ setIsMenuOpen, ref }: useOutsideClickProps) => {
     if (!isMediaMd) {
       const handleOutsideClick = (e: any) => {
         if (ref.current && !ref.current.contains(e.target)) {
+          document.body.style.overflow = "auto";
           setIsMenuOpen(false);
         }
       };

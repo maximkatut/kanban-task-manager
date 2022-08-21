@@ -26,6 +26,7 @@ const Sidebar = ({ setIsMenuOpen, isMenuOpen, boards }: SidebarProps) => {
   const checkIsMediaMdAndCloseMenu = () => {
     if (!isMediaMd) {
       setIsMenuOpen(false);
+      document.body.style.overflow = "auto";
     }
   };
 
@@ -48,7 +49,7 @@ const Sidebar = ({ setIsMenuOpen, isMenuOpen, boards }: SidebarProps) => {
       </Modal>
       <aside
         ref={ref}
-        className={`z-10 flex flex-col transition-all md:pb-8 w-[calc(65rem/4)] 
+        className={`z-20 flex flex-col transition-all md:pb-8 w-[calc(65rem/4)] 
         lg:w-[calc(75rem/4)] md:h-[calc(100vh-82px)] lg:h-[calc(100vh-98px)]
          bg-white dark:bg-grey-dark fixed top-[66px] md:top-[82px] lg:top-[98px] ${
            isMenuOpen

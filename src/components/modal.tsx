@@ -30,7 +30,7 @@ const Modal = ({ children, isModalOpen, setIsModalOpen }: ModalProps) => {
           padding: "0",
           border: "none",
         },
-        overlay: { zIndex: "10", backgroundColor: "rgba(0,0,0,0.5)" },
+        overlay: { zIndex: "30", backgroundColor: "rgba(0,0,0,0.5)" },
       }}
       isOpen={isModalOpen}
       onRequestClose={() => {

@@ -10,14 +10,14 @@ const UpDownArrows = ({ handleMoveUpButton, handleMoveDownButton, i, arr, isTask
   return (
     <div>
       <button
-        className={`absolute ${isTask ? "right-14" : "right-[5.5rem]"} top-4 group`}
+        className={`absolute h-10 w-8 ${isTask ? "right-16" : "right-24"} top-0 group flex justify-center items-center`}
         disabled={i === 0}
         onClick={(e) => {
           e.preventDefault();
           handleMoveUpButton(i);
         }}
       >
-        <svg width="20" height="14" xmlns="http://www.w3.org/2000/svg">
+        <svg className="ml-2 mt-2" width="20" height="14" xmlns="http://www.w3.org/2000/svg">
           <path
             className="group-hover:stroke-purple-hover group-disabled:stroke-purple-25"
             stroke="#635FC7"
@@ -29,13 +29,13 @@ const UpDownArrows = ({ handleMoveUpButton, handleMoveDownButton, i, arr, isTask
       </button>
       <button
         disabled={i === arr.length - 1}
-        className={`absolute ${isTask ? "right-8" : "right-16"} top-4 group `}
+        className={`flex justify-center items-center h-10 w-8 absolute ${isTask ? "right-8" : "right-16"} top-0 group `}
         onClick={(e) => {
           e.preventDefault();
           handleMoveDownButton(i, arr);
         }}
       >
-        <svg width="20" height="14" xmlns="http://www.w3.org/2000/svg">
+        <svg className="ml-2 mt-2" width="20" height="14" xmlns="http://www.w3.org/2000/svg">
           <path
             className="group-hover:stroke-purple-hover group-disabled:stroke-purple-25"
             stroke="#635FC7"

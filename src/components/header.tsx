@@ -55,6 +55,8 @@ const Header = ({ isMenuOpen, setIsMenuOpen }: HeaderProps) => {
     if (isMediaMd) {
       return;
     }
+    document.body.style.overflow = "hidden";
+
     setIsMenuOpen(!isMenuOpen);
   };
 
@@ -82,7 +84,7 @@ const Header = ({ isMenuOpen, setIsMenuOpen }: HeaderProps) => {
             className={` font-bold ${isMediaMd ? "text-2xl" : "cursor-pointer flex items-center text-lg"}`}
             onClick={handleSidebarOpenClick}
           >
-            {activeBoard && truncate(activeBoard.name)}
+            {activeBoard && truncate(activeBoard.name, width)}
             {!isMediaMd && (
               <svg
                 className={`mr-2 ${isMenuOpen ? "ml-2" : "rotate-180 mb-2"}`}
