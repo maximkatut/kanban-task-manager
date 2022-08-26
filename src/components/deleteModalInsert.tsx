@@ -1,4 +1,3 @@
-import { Board } from "@prisma/client";
 import { useStore } from "../store";
 import { useBoardStore } from "../store/boards";
 import { MD_WIDTH } from "../utils/const";
@@ -13,7 +12,7 @@ interface DeleteModalInsertProps {
 }
 
 const DeleteModalInsert = ({ setIsDeleteModalOpen, column, task, handleDeleteButton }: DeleteModalInsertProps) => {
-  const activeBoard = useBoardStore((state) => state.activeBoard) as Board;
+  const activeBoard = useBoardStore((state) => state.activeBoard);
   const setActiveBoard = useBoardStore((state) => state.setActiveBoard);
   const width = useStore((state) => state.width);
   const client = trpc.useContext();
@@ -29,7 +28,7 @@ const DeleteModalInsert = ({ setIsDeleteModalOpen, column, task, handleDeleteBut
     },
   });
   const handleDeleteBoardClick = () => {
-    deleteBoard({ boardId: activeBoard.id });
+    activeBoard && deleteBoard({ boardId: activeBoard.id });
   };
   const handleCancelClick = () => {
     setIsDeleteModalOpen(false);
@@ -42,7 +41,7 @@ const DeleteModalInsert = ({ setIsDeleteModalOpen, column, task, handleDeleteBut
       <h2 className="text-red mb-5 text-lg">Delete this {column ? "column" : task ? "task" : "board"}?</h2>
       <p className="text-grey-medium mb-5">
         {`Are you sure you want to delete the ${
-          column ? "column" : task ? "task" : `${activeBoard.name} board`
+          column ? "column" : task ? "task" : `${activeBoard && activeBoard.name} board`
         }? This action will remove ${task ? "the task" : `all ${column ? "" : "columns and"} tasks`} and
         cannot be reversed.`}
       </p>

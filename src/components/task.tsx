@@ -1,4 +1,4 @@
-import { Subtask, Task } from "@prisma/client";
+import { Task } from "@prisma/client";
 import { useState } from "react";
 import { Draggable } from "react-beautiful-dnd";
 import { trpc } from "../utils/trpc";
@@ -21,9 +21,7 @@ const Task = ({ task, index }: TaskProps) => {
 
   return (
     <>
-      <Modal {...{ isModalOpen, setIsModalOpen }}>
-        <TaskModalInsert subtasks={subtasks as Subtask[]} task={task} />
-      </Modal>
+      <Modal {...{ isModalOpen, setIsModalOpen }}>{subtasks && <TaskModalInsert {...{ subtasks, task }} />}</Modal>
       <Draggable draggableId={task.id} index={index}>
         {(provided) => (
           <li

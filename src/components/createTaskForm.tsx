@@ -1,4 +1,3 @@
-import { Column } from "@prisma/client";
 import useCreateTask from "../hooks/useCreateTask";
 import { useColumnsStore } from "../store/columns";
 import TaskForm from "./taskForm";
@@ -8,7 +7,7 @@ interface CreateTaskFormProps {
 }
 
 const CreateTaskForm = ({ setIsModalOpen }: CreateTaskFormProps) => {
-  const columns = useColumnsStore((state) => state.columns) as Column[];
+  const columns = useColumnsStore((state) => state.columns);
   const {
     onSubmit,
     register,
@@ -22,29 +21,31 @@ const CreateTaskForm = ({ setIsModalOpen }: CreateTaskFormProps) => {
     setIsModalOpen,
   });
 
-  return (
-    <TaskForm
-      task={{
-        id: "",
-        title: "",
-        description: null,
-        status: "",
-        order: 0,
-        columnId: "",
-      }}
-      {...{
-        columns,
-        onSubmit,
-        register,
-        errors,
-        fields,
-        handleRemoveCrossButton,
-        handleNewSubtaskButton,
-        handleMoveDownButton,
-        handleMoveUpButton,
-      }}
-    />
-  );
+  if (columns) {
+    return (
+      <TaskForm
+        task={{
+          id: "",
+          title: "",
+          description: null,
+          status: "",
+          order: 0,
+          columnId: "",
+        }}
+        {...{
+          columns,
+          onSubmit,
+          register,
+          errors,
+          fields,
+          handleRemoveCrossButton,
+          handleNewSubtaskButton,
+          handleMoveDownButton,
+          handleMoveUpButton,
+        }}
+      />
+    );
+  } else return <></>;
 };
 
 export default CreateTaskForm;

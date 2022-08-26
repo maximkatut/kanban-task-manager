@@ -84,24 +84,24 @@ const useEditBoard = ({ setIsModalOpen }: UseBoardProps) => {
     }
 
     for (let index = 0; index < data.columns.length; index++) {
-      await updateColumn({
-        id: data.columns[index]?.id as string,
-        name: data.columns[index]?.name,
-        order: index,
-        color: data.columns[index]?.color,
-      });
-    }
-
-    if (columns && data.columns.length > columns?.length) {
-      for (let index = data.columns.length - 1; index >= columns?.length; index--) {
+      const column = data.columns[index];
+      if (column?.id) {
+        await updateColumn({
+          id: data.columns[index]?.id as string,
+          name: data.columns[index]?.name,
+          order: index,
+          color: data.columns[index]?.color,
+        });
+      } else if (column) {
         await createColumn({
-          name: data.columns[index]?.name as string,
+          name: column.name,
           boardId: activeBoard.id,
           order: index,
-          color: data.columns[index]?.color as string,
+          color: column.color,
         });
       }
     }
+
     const newDataColumns = data.columns.map((c, i) => {
       c.order = i;
       return c;

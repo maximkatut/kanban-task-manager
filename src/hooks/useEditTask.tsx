@@ -83,11 +83,11 @@ const useEditTask = ({ setIsModalOpen, task }: UseTaskProps) => {
           order: i,
           title: subtask.title,
         });
-      } else {
+      } else if (subtask) {
         await createSubtask({
-          title: subtask?.title as string,
+          title: subtask.title,
           order: i,
-          taskId: task?.id as string,
+          taskId: task.id,
           isCompleted: false,
         });
       }

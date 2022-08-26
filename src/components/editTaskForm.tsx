@@ -1,4 +1,4 @@
-import { Column, Task } from "@prisma/client";
+import { Task } from "@prisma/client";
 import useEditTask from "../hooks/useEditTask";
 import { useColumnsStore } from "../store/columns";
 import TaskForm from "./taskForm";
@@ -26,24 +26,26 @@ const EditTaskForm = ({ task, setIsModalOpen, isEditMode }: EditTaskFormProps) =
     task,
   });
 
-  return (
-    <TaskForm
-      {...{
-        task,
-        isEditMode,
-        columns: columns as Column[],
-        onSubmit,
-        register,
-        errors,
-        fields,
-        handleMoveDownButton,
-        handleMoveUpButton,
-        handleRemoveCrossButton,
-        handleNewSubtaskButton,
-        isLoading,
-      }}
-    />
-  );
+  if (columns) {
+    return (
+      <TaskForm
+        {...{
+          task,
+          isEditMode,
+          columns,
+          onSubmit,
+          register,
+          errors,
+          fields,
+          handleMoveDownButton,
+          handleMoveUpButton,
+          handleRemoveCrossButton,
+          handleNewSubtaskButton,
+          isLoading,
+        }}
+      />
+    );
+  } else return <></>;
 };
 
 export default EditTaskForm;

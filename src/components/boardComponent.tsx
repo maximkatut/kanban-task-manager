@@ -1,4 +1,4 @@
-import { Board, Task } from "@prisma/client";
+import { Board } from "@prisma/client";
 import { useCallback, useEffect, useState } from "react";
 import { DragDropContext, OnDragEndResponder } from "react-beautiful-dnd";
 import { SubmitHandler, useForm } from "react-hook-form";
@@ -63,8 +63,10 @@ const BoardComponent = ({ board }: BoardProps) => {
 
   const updateTasks = useCallback(async () => {
     for (let i = 0; i < tasks.length; i++) {
-      const task = tasks[i] as Task;
-      await updateTask(task);
+      const task = tasks[i];
+      if (task) {
+        await updateTask(task);
+      }
     }
   }, [tasks, updateTask]);
 
@@ -87,16 +89,16 @@ const BoardComponent = ({ board }: BoardProps) => {
   });
 
   const onSubmit: SubmitHandler<Inputs> = async (data: Inputs) => {
-    const columnNames = columns?.map((c) => c.name.toLowerCase()) as string[];
-    if (columnNames.includes(data.columnName.toLowerCase())) {
+    const columnNames = columns?.map((c) => c.name.toLowerCase());
+    if (columnNames && columnNames.includes(data.columnName.toLowerCase())) {
       setError("columnName", { type: "custom", message: "This name already exists" }, { shouldFocus: true });
       return;
-    } else {
+    } else if (columns) {
       await createColumn(
         {
           name: data.columnName,
           boardId: board.id,
-          order: columns?.length as number,
+          order: columns.length,
           color: data.color,
         },
         {

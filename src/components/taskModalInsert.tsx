@@ -40,7 +40,7 @@ const TaskModalInsert = ({ subtasks, task }: TaskModalInsertProps) => {
     },
   });
   const activeSubtasks = subtasks.map((s) => s.isCompleted === true);
-  const activeColumn = columns?.find((c) => c.id === task.columnId) as Column;
+  const activeColumn = columns?.find((c) => c.id === task.columnId);
   const { register } = useForm<Inputs>({
     defaultValues: { checkbox: activeSubtasks },
   });
@@ -142,7 +142,7 @@ const TaskModalInsert = ({ subtasks, task }: TaskModalInsertProps) => {
           <select
             {...(register("status"), { onChange: handleSelectChange })}
             id="status"
-            defaultValue={activeColumn.name}
+            defaultValue={activeColumn && activeColumn.name}
             className={`hover:border-purple w-full py-3 px-4 border-[1px] bg-white uppercase border-lines-light dark:border-lines-dark rounded-sm mb-5 dark:bg-grey-very-dark`}
           >
             {columns?.map((c) => (
