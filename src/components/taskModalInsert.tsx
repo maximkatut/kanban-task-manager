@@ -1,5 +1,5 @@
 import { Column, Subtask, Task } from "@prisma/client";
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { useForm } from "react-hook-form";
 import { useColumnsStore } from "../store/columns";
 import { useTasksStore } from "../store/tasks";
@@ -22,6 +22,7 @@ interface Inputs {
 }
 
 const TaskModalInsert = ({ subtasks, task }: TaskModalInsertProps) => {
+  const refMenuDotsButton = useRef<HTMLButtonElement>(null);
   const [isDotsMenuOpen, setIsDotsMenuOpen] = useState<Boolean>(false);
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState<boolean>(false);
@@ -88,9 +89,10 @@ const TaskModalInsert = ({ subtasks, task }: TaskModalInsertProps) => {
       <div className="dark:bg-grey-very-dark p-8 rounded-sm">
         <div className="relative flex items-center mb-6 justify-between">
           <h3 className="text-lg  font-bold mr-5">{task.title}</h3>
-          <DotsButton onClick={clickDotsButtonHandler} />
+          <DotsButton onClick={clickDotsButtonHandler} refMenuDotsButton={refMenuDotsButton} />
           {isDotsMenuOpen && (
             <DotsMenu
+              refMenuDotsButton={refMenuDotsButton}
               task
               position="-right-5 top-12"
               setIsDotsMenuOpen={setIsDotsMenuOpen}

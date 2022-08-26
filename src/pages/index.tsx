@@ -13,6 +13,7 @@ import { trpc } from "../utils/trpc";
 
 const Home: NextPage = () => {
   const ref = useRef(true);
+  const refMenuHeaderButton = useRef<HTMLHeadingElement | null>(null);
   const [isMenuOpen, setIsMenuOpen] = useState<boolean>(false);
   const { data: boards, isLoading } = trpc.useQuery(["board.getAll"]);
   const activeBoard = useBoardStore((state) => state.activeBoard);
@@ -42,9 +43,9 @@ const Home: NextPage = () => {
         <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png" />
         <link rel="manifest" href="/site.webmanifest" />
       </Head>
-      <Header {...{ isMenuOpen, setIsMenuOpen }} />
+      <Header {...{ isMenuOpen, setIsMenuOpen, refMenuHeaderButton }} />
       <div className="inline-flex mt-[82px] lg:mt-[98px]">
-        {boards && <Sidebar {...{ setIsMenuOpen, isMenuOpen, boards }} />}
+        {boards && <Sidebar {...{ setIsMenuOpen, isMenuOpen, boards, refMenuHeaderButton }} />}
         <main
           className={`${
             isMenuOpen && isMediaMd && "ml-[calc(65rem/4)] lg:ml-[calc(75rem/4)]"

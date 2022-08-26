@@ -1,4 +1,4 @@
-import { useRef } from "react";
+import { RefObject, useRef } from "react";
 import useOutsideClick from "../hooks/useOutsideClick";
 
 interface DotsMenuProps {
@@ -7,12 +7,25 @@ interface DotsMenuProps {
   handleDeleteClick: () => void;
   position: string;
   task?: boolean;
+  refMenuDotsButton: RefObject<HTMLButtonElement>;
 }
 
-const DotsMenu = ({ setIsDotsMenuOpen, handleEditClick, handleDeleteClick, position, task }: DotsMenuProps) => {
+const DotsMenu = ({
+  setIsDotsMenuOpen,
+  handleEditClick,
+  handleDeleteClick,
+  position,
+  task,
+  refMenuDotsButton,
+}: DotsMenuProps) => {
   const ref = useRef<HTMLDivElement | null>(null);
   const name = task ? "Task" : "Board";
-  const {} = useOutsideClick({ setIsMenuOpen: setIsDotsMenuOpen, ref });
+  const {} = useOutsideClick({
+    setIsMenuOpen: setIsDotsMenuOpen,
+    ref,
+    refMenuButton: refMenuDotsButton,
+    isDotsMenu: true,
+  });
 
   return (
     <div

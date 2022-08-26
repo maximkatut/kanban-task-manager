@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { RefObject, useEffect, useRef, useState } from "react";
 import { useStore } from "../store";
 import { useBoardStore } from "../store/boards";
 import { useColumnsStore } from "../store/columns";
@@ -15,9 +15,11 @@ import Logo from "./svg/logo";
 interface HeaderProps {
   isMenuOpen?: boolean;
   setIsMenuOpen: (x: boolean) => void;
+  refMenuHeaderButton: RefObject<HTMLHeadingElement>;
 }
 
-const Header = ({ isMenuOpen, setIsMenuOpen }: HeaderProps) => {
+const Header = ({ isMenuOpen, setIsMenuOpen, refMenuHeaderButton }: HeaderProps) => {
+  const refMenuDotsButton = useRef<HTMLButtonElement | null>(null);
   const activeBoard = useBoardStore((state) => state.activeBoard);
   const columns = useColumnsStore((state) => state.columns);
   const width = useStore((state) => state.width);
@@ -81,6 +83,7 @@ const Header = ({ isMenuOpen, setIsMenuOpen }: HeaderProps) => {
         </div>
         <div className="flex items-center justify-between flex-grow px-3 md:pl-10 md:pr-6">
           <h2
+            ref={refMenuHeaderButton}
             className={` font-bold ${isMediaMd ? "text-2xl" : "cursor-pointer flex items-center text-lg"}`}
             onClick={handleSidebarOpenClick}
           >
@@ -110,13 +113,14 @@ const Header = ({ isMenuOpen, setIsMenuOpen }: HeaderProps) => {
             >
               {isMediaMd ? "+ Add New Task" : "+"}
             </Button>
-            <DotsButton onClick={clickDotsButtonHandler} />
+            <DotsButton onClick={clickDotsButtonHandler} refMenuDotsButton={refMenuDotsButton} />
             {isDotsMenuOpen && (
               <DotsMenu
                 position={isMediaMd ? "top-20 left-0" : "top-16 right-0"}
                 setIsDotsMenuOpen={setIsDotsMenuOpen}
                 handleDeleteClick={handleDeleteClick}
                 handleEditClick={handleEditClick}
+                refMenuDotsButton={refMenuDotsButton}
               />
             )}
           </div>

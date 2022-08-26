@@ -5,14 +5,19 @@ import { MD_WIDTH } from "../utils/const";
 interface useOutsideClickProps {
   setIsMenuOpen: (x: boolean) => void;
   ref: RefObject<HTMLElement>;
+  isDotsMenu?: boolean;
+  refMenuButton: RefObject<HTMLElement | undefined>;
 }
 
-const useOutsideClick = ({ setIsMenuOpen, ref }: useOutsideClickProps) => {
+const useOutsideClick = ({ setIsMenuOpen, ref, refMenuButton, isDotsMenu }: useOutsideClickProps) => {
   const width = useStore((state) => state.width);
-  const isMediaMd = width > MD_WIDTH;
+  const isMediaMd = isDotsMenu ? false : width > MD_WIDTH;
   useEffect(() => {
     if (!isMediaMd) {
       const handleOutsideClick = (e: any) => {
+        if (refMenuButton.current && refMenuButton.current.contains(e.target)) {
+          return;
+        }
         if (ref.current && !ref.current.contains(e.target)) {
           document.body.style.overflow = "auto";
           setIsMenuOpen(false);

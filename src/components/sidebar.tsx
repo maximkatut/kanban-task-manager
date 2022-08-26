@@ -1,5 +1,5 @@
 import { Board } from "@prisma/client";
-import { useRef, useState } from "react";
+import { RefObject, useRef, useState } from "react";
 import useOutsideClick from "../hooks/useOutsideClick";
 import { useStore } from "../store";
 import { useBoardStore } from "../store/boards";
@@ -13,15 +13,16 @@ interface SidebarProps {
   setIsMenuOpen: (x: boolean) => void;
   isMenuOpen: boolean;
   boards: Board[];
+  refMenuHeaderButton: RefObject<HTMLElement | undefined>;
 }
 
-const Sidebar = ({ setIsMenuOpen, isMenuOpen, boards }: SidebarProps) => {
+const Sidebar = ({ setIsMenuOpen, isMenuOpen, boards, refMenuHeaderButton }: SidebarProps) => {
   const ref = useRef<HTMLElement | null>(null);
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
   const setActiveBoard = useBoardStore((state) => state.setActiveBoard);
   const activeBoard = useBoardStore((state) => state.activeBoard);
   const width = useStore((state) => state.width);
-  const {} = useOutsideClick({ setIsMenuOpen, ref });
+  const {} = useOutsideClick({ setIsMenuOpen, ref, refMenuButton: refMenuHeaderButton });
 
   const checkIsMediaMdAndCloseMenu = () => {
     if (!isMediaMd) {

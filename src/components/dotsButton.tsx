@@ -1,10 +1,13 @@
+import { RefObject } from "react";
+
 interface DotsButtonProps {
   onClick?: () => void;
+  refMenuDotsButton: RefObject<HTMLButtonElement>;
 }
 
-const DotsButton = ({ onClick }: DotsButtonProps) => {
+const DotsButton = ({ onClick, refMenuDotsButton }: DotsButtonProps) => {
   return (
-    <button onClick={onClick} className="px-2 group">
+    <button ref={refMenuDotsButton} onClick={onClick} className="px-2 group">
       <svg
         className="group-hover:fill-purple fill-grey-medium"
         width="5"
